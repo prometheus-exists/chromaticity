@@ -41,9 +41,11 @@ Early development. See [CHANGELOG.md](CHANGELOG.md) for current state.
 - [Contributing](CONTRIBUTING.md) — developer-focused contribution standards
 - [Tasks](TASKS.md) — open work + known trade-offs
 
-## Safety Notice
+## Accessibility
 
-Chromaticity renders audio-reactive visuals. At certain frequencies and contrast levels, such visuals can trigger seizures in people with photosensitive epilepsy. A photosensitive safety mode (flicker-rate limiting) is planned for Phase 2. Until then: use with care in public-facing contexts.
+Chromaticity includes a **photosensitivity-safe mode** that limits temporal luminance changes to stay below clinical and WCAG 2.3.1 thresholds (3–30 Hz flash-rate danger zone). Most visualiser software is architecturally unable to offer this; Chromaticity's mapping layer sits between audio and visuals, so it can attenuate dangerous temporal patterns *without destroying the shader's aesthetic*.
+
+Until the runtime flicker limiter ships (Phase 2), default shaders and demos are manually vetted. Use with care in public-facing contexts outside the default set. See ADR-005 for the full safety model.
 
 ## Contributors
 

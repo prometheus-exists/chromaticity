@@ -18,7 +18,7 @@ That's it. That's the whole model. You write a function. The GPU runs it a few m
 
 Imagine you have a 1920×1080 screen — about 2 million pixels. Every 1/60th of a second, you need to decide what colour each pixel is.
 
-Writing 2 million `if` statements is obviously impossible. Instead, you write **one function** — the fragment shader. The GPU runs this function once per pixel, in parallel, with different *inputs*:
+You can't hand-paint 2 million pixels 60 times per second. Instead, you write **one function** — the fragment shader. The GPU runs this function once per pixel, in parallel, with different *inputs*:
 
 - The pixel's position on screen (normalised to 0–1)
 - A clock (time since start)
@@ -82,7 +82,8 @@ The audio input is where Shadertoy traditionally added reactivity. But it's a te
 2. **Features extracted**: energy, spectral centroid, beat detected? tempo?
 3. **Mapping applied**: each audio feature drives one or more shader uniforms per the mapping profile
 4. **GPU renders**: the shader runs once per pixel, using the new uniform values
-5. **Frame displayed**
+5. **Safety check**: frame luminance delta is compared against photosensitivity thresholds (ADR-005). If the mapping would produce flashes in the 3–30 Hz danger zone, the output is attenuated. This is architectural — the pipeline enforces it, not the shader artist.
+6. **Frame displayed**
 
 Total budget: ~16ms. Of that, audio features take ~1ms, mapping takes ~0.1ms, rendering takes ~5-10ms (depends on shader complexity). We have slack. The architecture keeps it that way (ADR-002).
 
@@ -94,10 +95,13 @@ Everything in the visual output is *literally* a mathematical function of the au
 
 - If the mapping is wrong, the visuals misrepresent the music. "Wrong" here means **perceptually wrong** — the mapping violates what humans expect to see when they hear certain things.
 - If the mapping is principled, the visuals reinforce perception. The bass feels *louder* because the visual is *bigger*. The high-hat feels *sharper* because the visual has *more high-frequency detail*.
+- If the mapping produces dangerous temporal luminance patterns, perception science tells us that too — and the architecture can enforce limits. This is where *"perceptually principled"* includes *"perceptually safe."*
 
 The design question is not "what's a cool visual?" — the shader artists already answered that. The question is: **given this shader, what mapping of audio→uniforms produces perceptually coherent output?**
 
-This is where perception science is load-bearing, not decorative.
+This is where perception science is load-bearing, not decorative. (See Spence 2011 for a broad review of cross-modal correspondences; Palmer et al. 2013 for music-colour specifically.)
+
+**Caveat worth naming upfront**: most CMC effects are measured with simple stimuli in controlled settings (pure tones, static colours, forced-choice tasks). Effect sizes in complex, dynamic audiovisual scenes remain an open question. This is part of why evaluation methodology matters (Phase 3) — the visualiser itself becomes an instrument for measuring what CMC literature hasn't yet measured.
 
 ---
 
@@ -118,7 +122,7 @@ For each, we need to answer:
 
 For `u_zoom`: probably controls spatial scale. Maps to `arousal` (high-energy sections feel close; ambient sections feel distant). Linear curve.
 
-For `u_color_shift`: probably rotates the hue. Maps to `valence` (Palmer et al. 2013 — emotion mediates colour). Or to `spectral_centroid` (higher-frequency content = brighter). Needs context.
+For `u_color_shift`: probably rotates the hue. Maps to `valence` (Palmer et al. 2013 — music-colour associations are emotionally mediated: music → emotion → colour preference). Or to `spectral_centroid` (higher-frequency content = brighter). Needs context.
 
 For `u_detail`: probably increases spatial frequency / texture complexity. Maps to `spectral_flux` (more overtone/noise content = more detail). Moderate evidence from timbre-texture CMC.
 

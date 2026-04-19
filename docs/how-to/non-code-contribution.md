@@ -75,6 +75,13 @@ The tutorials, glossary, and explanations are living documents. If you read one 
 ### 6. Issue reporting
 Actual bug reports, feature requests, design questions. Standard GitHub issues (templates provided).
 
+### 7. Photosensitivity review
+Reviewing whether a shader + mapping combination could produce dangerous temporal luminance patterns. This is a perceptual science contribution — understanding the relationship between beat-synced visual changes and photosensitive seizure thresholds.
+
+**Context**: Chromaticity is architecturally positioned to offer photosensitivity-safe visualisation (see ADR-005). The mapping layer sits between audio features and visual output, so we can attenuate dangerous temporal patterns without destroying a shader's aesthetic. Most visualiser software can't do this.
+
+**Contributions in this space**: reviewing shader profiles for safety edge cases, proposing adjustments to the flicker-rate limiting algorithm, surfacing individual-difference considerations (some photosensitive users are triggered by specific colours or patterns, not just rates), helping draft the user-facing accessibility mode specification.
+
 ---
 
 ## GitHub workflow for non-developers
@@ -133,12 +140,18 @@ For most non-code contributions, just open the PR or issue — we'll route from 
 
 | Surface | Status | When ready |
 |---------|--------|-----------|
-| Name-heuristic dictionary | 🔲 Not yet | Phase 1, week 1 |
+| **Docs + glossary review** | ✅ **Ready now** | **Start here** |
+| **Issues** | ✅ **Ready now** | Anytime |
+| **Photosensitivity review** | ✅ Ready now | Anytime |
 | Mapping profile schema (ADR-004) | ✅ Ready | Now |
+| Audio features reference | 🔲 Not yet | Phase 2 |
+| Name-heuristic dictionary | 🔲 Not yet | Phase 1, week 1 |
 | Shader library | 🔲 Not yet | Phase 1 |
 | Generated mapping profiles | 🔲 Not yet | Phase 1 |
 | Perceptual review of outputs | 🔲 Not yet | Phase 2 |
-| Docs + glossary | ✅ Ready | Now |
-| Issues | ✅ Ready | Now |
 
-If you want to get started *now*, the two ready surfaces are: docs improvements and issues. Everything else becomes ready as Phase 1 lands.
+### Concrete first task
+
+Read `docs/reference/vocabulary.md`. Does anything in the perception-science column strike you as wrong, imprecise, or missing? Open an issue titled `vocabulary: [term]` with your proposed change and why. That's a meaningful contribution on day one, and your domain expertise is load-bearing for the whole project from that point on.
+
+If you want to get started *now*, the surfaces marked ✅ above are live. Everything else becomes ready as Phase 1 lands.

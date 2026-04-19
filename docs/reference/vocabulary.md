@@ -10,7 +10,7 @@ Chromaticity sits at the intersection of three fields that use the same words fo
 
 | Field | Definition | How it's measured |
 |-------|-----------|-------------------|
-| **Perception science** | Subjective sensation of luminous intensity. Non-linear in physical light: doubling photons doesn't double perceived brightness. Formally: L* in CIE Lab space (0–100) — cube-root of luminance, tuned to human vision. | Psychophysics (matching tasks); approximated by L* |
+| **Perception science** | Subjective sensation of luminous intensity. Non-linear in physical light: doubling photons doesn't double perceived brightness. Formally: L* in CIE Lab space (0–100) — approximately a cube-root-scaled function of relative luminance, with a linear segment near black. Tuned to match human lightness discrimination. | Psychophysics (matching tasks); approximated by L* |
 | **GLSL / graphics** | Often just `(r+g+b)/3` or max(r,g,b). Sometimes V in HSV, sometimes Y in YCbCr. **Not perceptually uniform** — naive RGB means doubling r/g/b values doesn't double perceived brightness. | `length(color.rgb)` or `dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))` (ITU-R BT.709 luma) |
 | **Music (timbre)** | Perceived sharpness/clarity of a sound. High "brightness" music has strong high-frequency energy. | Spectral centroid (the "centre of mass" of the spectrum, Hz) |
 
@@ -147,6 +147,18 @@ All closely related, often confused. Precise definitions:
 
 ---
 
+## `flash rate` / `temporal luminance frequency`
+
+| Field | Definition |
+|-------|-----------|
+| **Perception science** | Rate of luminance change that can trigger photosensitive seizures. Clinical danger zone: 3–30 Hz (Harding & Harding 1999). WCAG 2.3.1 sets the threshold at ≥3 general flashes/second or below the general-flash / red-flash thresholds. |
+| **GLSL / graphics** | Frame-to-frame luminance delta. At 60fps, a brightness oscillation at N Hz means the luminance crosses its mean every 60/(2N) frames. |
+| **Music** | Beat-synced brightness transients. At 174 BPM with 16th-note sync, brightness changes occur at ~11.6 Hz — mid-band of the danger zone. Even at 120 BPM, 16th notes produce ~8 Hz flicker. |
+
+**Usage in Chromaticity**: the mapping engine enforces a maximum luminance-delta-per-frame constraint (see ADR-005). This is **not just a safety check, it's an accessibility feature**. Chromaticity can offer a photosensitivity-safe mode that limits temporal luminance changes while preserving the shader's aesthetic — something most visualiser software does not do. Framing: *"perceptually principled" includes "perceptually safe."*
+
+---
+
 ## `arousal` vs `valence`
 
 Core dimensions of the Russell circumplex model of affect (1980). Foundational for Palmer et al. 2013's music-colour finding.
@@ -156,7 +168,7 @@ Core dimensions of the Russell circumplex model of affect (1980). Foundational f
 | **Arousal** | Low-to-high activation/intensity. Calm → excited. Mostly driven by energy, tempo. |
 | **Valence** | Negative-to-positive affect. Sad → happy. Driven by mode (major/minor), harmonic brightness. |
 
-**Usage in Chromaticity**: we extract approximate arousal and valence from audio features and use them to drive the colour model (Palmer 2013).
+**Usage in Chromaticity**: we extract approximate arousal and valence from audio features and use them to drive the colour model. Palmer et al. (2013) found that music-colour associations are mediated by shared emotional content — music and colours that evoke similar arousal/valence are perceived as "going together." Chromaticity's colour pipeline is built on this: music → emotion → colour, not music → colour directly.
 
 ---
 
