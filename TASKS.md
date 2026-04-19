@@ -31,6 +31,7 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 
 - **End-game likely paid product** (Fletcher raised, Xavier reaffirmed 2026-04-19). ADR-003 licensing decision (MIT + permissive deps) keeps this option open.
 - **Live performance is non-negotiable**: Fletcher confirmed zero-buffer reactivity requirement (2026-04-19). Eliminates any dependency with >5ms latency in the critical path. Reinforces ADR-002 (preprocess/live split).
+- **Accessibility as a feature, not just a constraint** (Fletcher 2026-04-19): photosensitivity accommodation should be leaned into as a differentiator. Most visualiser software is actively hostile to photosensitive users; Chromaticity can be the first that explicitly supports them. Potential marketing positioning + potential future research collaboration angle (visual perception + accessibility = publishable). Reinforces ADR-005 safety-by-default design.
 
 ## Ignore-flag tracking
 
