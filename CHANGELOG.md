@@ -14,6 +14,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - ADR-004: Mapping profile JSON schema (v0.1.0) — data contract between render-probe and live runtime, Fletcher-editable
 - ADR-005: Shader security & photosensitivity model — three-layer containment (subprocess isolation + live budgets + safety-by-default), WCAG 2.3 compliant
 - ADR-006: Render-probe three-stage inference pipeline — name heuristic → source analysis → render-probe (with explicit timeboxes)
+- Tutorial: `docs/tutorials/glsl-for-perception-scientists.md` — 10-minute crash course for non-shader-devs
+- Reference: `docs/reference/vocabulary.md` — shared glossary across perception, GLSL, and music
+- How-to: `docs/how-to/non-code-contribution.md` — contribution paths that don't require Python
 - Design document (`docs/explanation/design.md`) with CMC mapping table + phase plan
 - References directory with prior-art repos tiered by relevance
 - Academic prior-art review (Hermes, 2026-04-19) covering CMC, temporal binding, groove, embodied cognition, chromesthesia

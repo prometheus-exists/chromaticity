@@ -34,8 +34,11 @@ Early development. See [CHANGELOG.md](CHANGELOG.md) for current state.
 
 - [Standards](docs/STANDARDS.md) — coding standards, Definition of Done
 - [Design](docs/explanation/design.md) — why it's built this way
-- [ADRs](docs/reference/ADR/) — architecture decisions (ADR-001 render-probe, ADR-002 preprocess/live split, ADR-003 MIT licensing, ADR-004 schema, ADR-005 security+safety, ADR-006 3-stage pipeline)
-- [Contributing](CONTRIBUTING.md) — how to contribute
+- [ADRs](docs/reference/ADR/) — architecture decisions
+- [Vocabulary](docs/reference/vocabulary.md) — shared glossary (perception × GLSL × music)
+- [GLSL for Perception Scientists](docs/tutorials/glsl-for-perception-scientists.md) — if you know perception but not shaders
+- [Non-code contribution guide](docs/how-to/non-code-contribution.md) — how to contribute without writing Python
+- [Contributing](CONTRIBUTING.md) — developer-focused contribution standards
 - [Tasks](TASKS.md) — open work + known trade-offs
 
 ## Safety Notice
@@ -44,7 +47,7 @@ Chromaticity renders audio-reactive visuals. At certain frequencies and contrast
 
 ## Contributors
 
-- Xavier Murrell (lab infrastructure, Python/ML)
+- Xavier Butler (lab infrastructure, Python/ML)
 - Fletcher Hammond (perceptual science, music domain expertise)
 - Prometheus (research, architecture, build)
 
