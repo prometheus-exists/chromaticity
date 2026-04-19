@@ -27,6 +27,12 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 - [ ] Shadertoy marketplace integration — API exists, may be useful later
 - [ ] **"GLSL for Perception Scientists" blog post** — Fletcher-led, publishable on a lab blog / personal site. High value for an underexplored intersection. Source the 1-pager version from Hermes's F3 finding; expand with visual examples. Xavier flagged this 2026-04-19.
 
+## Design ideas (not yet scoped, not yet architectural decisions)
+
+- **Genre-parameterised setlist mode** (Xavier 2026-04-20): the slow layer's time constant for colour palette drift should be genre-specific (8-15s for DnB, 30-60s for ambient/classical — see exploration `2026-04-20-two-layer-matched-filter.md`). A setlist-prep mode where DJs/VJs can tag per-track genre metadata before a set would let Chromaticity auto-configure the emotional bandwidth parameters for each track. Default: plug-and-play with reasonable universal defaults. Expert mode: manual override with pre-set genre profiles or custom time constants. Don't architect this now — note it for Phase 4 UX discussion.
+
+---
+
 ## Product direction
 
 - **End-game likely paid product** (Fletcher raised, Xavier reaffirmed 2026-04-19). ADR-003 licensing decision (MIT + permissive deps) keeps this option open.
