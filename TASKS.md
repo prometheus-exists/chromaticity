@@ -25,6 +25,12 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 - [ ] Prediction-error visualiser (from initial design conversation) — needs Witek et al. read + phrase-level refactor
 - [ ] Individual CMC calibration layer — research-interesting, not v1
 - [ ] Shadertoy marketplace integration — API exists, may be useful later
+- [ ] **"GLSL for Perception Scientists" blog post** — Fletcher-led, publishable on a lab blog / personal site. High value for an underexplored intersection. Source the 1-pager version from Hermes's F3 finding; expand with visual examples. Xavier flagged this 2026-04-19.
+
+## Product direction
+
+- **End-game likely paid product** (Fletcher raised, Xavier reaffirmed 2026-04-19). ADR-003 licensing decision (MIT + permissive deps) keeps this option open.
+- **Live performance is non-negotiable**: Fletcher confirmed zero-buffer reactivity requirement (2026-04-19). Eliminates any dependency with >5ms latency in the critical path. Reinforces ADR-002 (preprocess/live split).
 
 ## Ignore-flag tracking
 

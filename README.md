@@ -34,7 +34,7 @@ Early development. See [CHANGELOG.md](CHANGELOG.md) for current state.
 
 - [Standards](docs/STANDARDS.md) — coding standards, Definition of Done
 - [Design](docs/explanation/design.md) — why it's built this way
-- [ADRs](docs/reference/ADR/) — architecture decisions
+- [ADRs](docs/reference/ADR/) — architecture decisions (ADR-001 render-probe, ADR-002 preprocess/live split, ADR-003 MIT licensing, ADR-004 schema, ADR-005 security+safety, ADR-006 3-stage pipeline)
 - [Contributing](CONTRIBUTING.md) — how to contribute
 - [Tasks](TASKS.md) — open work + known trade-offs
 

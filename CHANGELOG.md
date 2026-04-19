@@ -11,6 +11,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - ADR-001: Render-probe for uniform semantic inference
 - ADR-002: Pre-process / live runtime split architecture
 - ADR-003: MIT-permissive licensing — no GPL/AGPL/NC dependencies. Aubio removed; custom beat detection required.
+- ADR-004: Mapping profile JSON schema (v0.1.0) — data contract between render-probe and live runtime, Fletcher-editable
+- ADR-005: Shader security & photosensitivity model — three-layer containment (subprocess isolation + live budgets + safety-by-default), WCAG 2.3 compliant
+- ADR-006: Render-probe three-stage inference pipeline — name heuristic → source analysis → render-probe (with explicit timeboxes)
 - Design document (`docs/explanation/design.md`) with CMC mapping table + phase plan
 - References directory with prior-art repos tiered by relevance
 - Academic prior-art review (Hermes, 2026-04-19) covering CMC, temporal binding, groove, embodied cognition, chromesthesia
