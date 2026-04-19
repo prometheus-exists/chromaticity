@@ -26,7 +26,7 @@ Most Shadertoy shaders are visually stunning but not audio-reactive. The barrier
 - **moderngl** (Python OpenGL bindings) — thin, fast, full GLSL control
 - **Shadertoy GLSL dialect** as the target — largest community, best content
 - Standard uniforms: `iTime`, `iResolution`, `iAudioData` (Shadertoy-compatible)
-- Platform: macOS + Windows
+- **Platform: macOS + Windows co-primary**. Every feature works on both or doesn't ship. CI tests both.
 
 ### Audio pipeline
 - `sounddevice` — audio capture

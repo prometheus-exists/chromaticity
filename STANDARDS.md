@@ -16,8 +16,11 @@
 - Prefer stdlib over third-party where equivalent
 
 ## Platform
-- macOS primary (M-series), Windows supported
-- No Linux-specific code unless it's free
+- **macOS + Windows are co-primary targets** — every feature must work on both before it ships
+- Cross-platform testing is a Definition of Done item, not an afterthought
+- Platform-specific code paths (audio backends, shader dialects, file paths) must be documented + covered by CI on both OSes
+- No Linux-specific code unless it's free (both Xavier's and Fletcher's dev environments are macOS/Windows)
+- Line endings: use `.gitattributes` to enforce LF for source files (Windows dev must not introduce CRLF)
 
 ## Commits
 - Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
