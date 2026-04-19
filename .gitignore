@@ -29,10 +29,13 @@ Thumbs.db
 # Generated
 *.mapping.json
 
-# Test audio (not committed, see test-audio/README.md)
+# Test audio: copyrighted tracks are not committed (see test-audio/README.md)
+# Exception: brotherdurry-constancy.mp3 is rights-cleared and committed for CI/reproducibility
 test-audio/*.wav
 test-audio/*.flac
+!test-audio/brotherdurry-constancy.mp3
 test-audio/*.mp3
+!test-audio/brotherdurry-constancy.mp3
 test-audio/*.aif
 test-audio/*.aiff
 test-audio/*.m4a

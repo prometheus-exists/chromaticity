@@ -2,16 +2,17 @@
 
 Fletcher-curated test tracks spanning genres and tempos for Chromaticity development.
 
-**Not committed to git** — audio files are gitignored to keep the repo small and avoid copyright issues. Contributors who want these tracks should ask Fletcher directly.
+**Most tracks not committed to git** — audio files gitignored to keep the repo small and avoid copyright issues. The one exception is `brotherdurry-constancy.mp3` which is rights-cleared and committed for CI/reproducibility. Contributors who want the other tracks should ask Fletcher directly.
 
 ## Track inventory (received 2026-04-19)
 
-| Filename | Artist | Title | BPM | Format | Duration | Notes |
-|----------|--------|-------|-----|--------|----------|-------|
-| `notion-temporary-friends-maysev-flip-172bpm.wav` | Notion | Temporary Friends (Maysev Flip) | 172 | WAV 16-bit stereo | 2:26 | **DnB territory**. Test case for half-time feel + high-tempo handling. Bitwig Studio 6.0 export. |
-| `moldae-white-noise-warrior-73bpm.flac` | Moldae | White Noise Warrior | 73 | FLAC stereo | 3:18 | **Slow tempo**. From the NETHRA compilation. Test case for low-BPM mapping + atmospheric dynamics. |
-| `fletcher-unknown-2021-10.wav` | Fletcher | (untitled, 2021-10-17) | ? | WAV 24-bit stereo | 3:12 | Fletcher's own track. Logic Pro X export. BPM not tagged — let beat tracker infer. |
-| `redrum-warp-2022-72bpm.flac` | Re:drum | Warp 2022 | 72 | FLAC stereo | 4:13 | From Bassboosted Edits EP. **Bass-heavy**. Test case for sub-bass energy mapping. |
+| Filename | Artist | Title | BPM | Format | Duration | Rights | Notes |
+|----------|--------|-------|-----|--------|----------|--------|-------|
+| `brotherdurry-constancy.mp3` | BrotherDurry | Constancy | ? | MP3 320kbps stereo 48kHz | 4:14 | ✅ **Rights cleared, committed** | Fletcher's own track with full rights. Canonical CI test track — reproducible across all contributors. |
+| `notion-temporary-friends-maysev-flip-172bpm.wav` | Notion | Temporary Friends (Maysev Flip) | 172 | WAV 16-bit stereo | 2:26 | Not committed | **DnB territory**. Test case for half-time feel + high-tempo handling. Bitwig Studio 6.0 export. |
+| `moldae-white-noise-warrior-73bpm.flac` | Moldae | White Noise Warrior | 73 | FLAC stereo | 3:18 | Not committed | **Slow tempo**. From the NETHRA compilation. Test case for low-BPM mapping + atmospheric dynamics. |
+| `fletcher-unknown-2021-10.wav` | Fletcher | (untitled, 2021-10-17) | ? | WAV 24-bit stereo | 3:12 | Not committed | Fletcher's own production. Logic Pro X export. BPM not tagged — let beat tracker infer. |
+| `redrum-warp-2022-72bpm.flac` | Re:drum | Warp 2022 | 72 | FLAC stereo | 4:13 | Not committed | From Bassboosted Edits EP. **Bass-heavy**. Test case for sub-bass energy mapping. |
 
 ## Coverage
 
