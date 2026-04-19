@@ -15,7 +15,9 @@ A live music visualiser that makes arbitrary Shadertoy-compatible GLSL shaders a
 - A full VJ suite
 
 ### Primary use case
-Live DnB performance. Fletcher performs live; stability > features. A crash on stage is unacceptable.
+Live music performance across genres. Stability > features. A crash on stage is unacceptable.
+
+DnB is the development reference genre (Fletcher's domain), but all design decisions should be genre-agnostic. High-tempo considerations (e.g. half-time metric tracking at 170+ BPM) are implemented as adaptive behaviour based on detected tempo, not genre-specific hard-coding.
 
 ### The key insight
 Most Shadertoy shaders are visually stunning but not audio-reactive. The barrier isn't GLSL capability — it's that wiring up audio reactivity manually requires knowing both audio DSP and shader programming. We eliminate that barrier with render-probe analysis + principled defaults.
@@ -40,11 +42,20 @@ Based on cross-modal correspondence literature:
 | Audio feature | Visual parameter type | Basis |
 |---|---|---|
 | Energy / RMS | Brightness / luminance | Universal CMC |
-| Spectral centroid (brightness) | Colour temperature (warm→cool) | Pitch-brightness correspondence |
-| Tempo / BPM | Motion speed | Temporal correspondence |
+| Spectral centroid | Colour lightness | Pitch-brightness correspondence |
+| Tempo / BPM | Motion speed (adaptive: half-time at 160+ BPM) | Temporal correspondence |
 | Spectral flux | Spatial complexity / texture | Timbre-texture correspondence |
 | Beat onset | Scale / pulse events | Rhythmic entrainment |
 | Bassline energy (sub-80Hz) | Low-frequency visual weight | Frequency-size correspondence |
+| Arousal (energy + tempo) + Valence (mode/harmony) | Colour palette | Palmer et al. 2013 — emotion mediates colour |
+
+### Colour control model
+Colour is the most individually variable CMC. Three-tier control:
+1. **Automatic** — emotion-mediated default. Extract arousal (energy + tempo) and valence (harmonic brightness/mode) → map to colour palette. High arousal = warm/saturated; low arousal = cool/desaturated.
+2. **Suggested palettes** — curated named presets (warm/energetic, cool/atmospheric, monochrome, neon, etc.). System animates within the palette bounds; user picks the palette.
+3. **Manual override** — user selects base colours; system handles animation, saturation modulation, brightness shifts within that palette.
+
+Automatic mode runs by default. Manual override always accessible. This respects the high individual variation in colour-music associations documented in the CMC literature.
 
 These are defaults. Users can adjust per-shader after render-probe analysis.
 
