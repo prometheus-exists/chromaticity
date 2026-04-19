@@ -72,6 +72,11 @@ These are defaults. Users can adjust per-shader after render-probe analysis.
 - Design discussions in #lab Discord, decisions recorded in ADRs
 - Xavier + Prometheus build; Fletcher reviews, tests, provides perceptual expertise
 
+### Competitive observations (from active Synesthesia use)
+- Colour scheme flexibility is poor — presets are rigid, insufficient per-shader control
+- No good reason for this limitation architecturally; it's a product decision that frustrates users
+- Chromaticity should make colour fully configurable at every level (palette, per-parameter, per-shader)
+
 ### Open questions
 - Shader uniform range metadata: rely on Shadertoy `rangeDef` annotations? Or probe-inferred ranges?
 - Output: direct fullscreen window, or Syphon/Spout/NDI for routing into other tools?
