@@ -28,3 +28,12 @@ Thumbs.db
 
 # Generated
 *.mapping.json
+
+# Test audio (not committed, see test-audio/README.md)
+test-audio/*.wav
+test-audio/*.flac
+test-audio/*.mp3
+test-audio/*.aif
+test-audio/*.aiff
+test-audio/*.m4a
+test-audio/*.ogg
