@@ -9,6 +9,7 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 - [ ] Phase 3: CMC-principled mapping integration
 - [ ] Phase 4: UX layer (shader library, mapping editor, performance mode)
 - [ ] Mapping profile JSON schema — not yet specified (ADR-003 to be written when we design it)
+- [ ] Beat tracking validation: compare aubio-inferred BPM against human-tapped ground truth on the untagged test track (Fletcher ear-taps his own track). Live performance gets raw audio, no metadata — the pipeline must work from waveform alone.
 - [ ] Photosensitive epilepsy safety mode — flicker rate limiting + user opt-in for strobe effects (Phase 2+)
 - [ ] Windows audio backend testing (sounddevice behaviour differs from macOS; validate WASAPI/MME/DirectSound paths)
 - [ ] macOS audio backend testing (CoreAudio permissions, device hot-swap handling)
