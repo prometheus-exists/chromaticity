@@ -37,6 +37,12 @@
 - Render-probe results validated against known shaders
 - No GUI popup tests (headless rendering only in CI)
 
+## Accessibility & Safety
+- **Photosensitive epilepsy**: audio-reactive flicker in the 3–30Hz range at high contrast can trigger seizures. Any visual output that could produce such flicker must be gated behind a user opt-in (default: photosensitive safe mode = ON)
+- High-contrast strobe effects require an explicit warning at load time
+- Flicker-rate limiter (Phase 2+): cap visual oscillation at 3Hz by default; user can opt out per-shader
+- Follow W3C WCAG 2.3 guidelines (three flashes or fewer per second OR below the general flash threshold)
+
 ## Secrets
 - No credentials, API keys, or tokens in the repo
 - `.gitignore` covers common secret files

@@ -30,11 +30,25 @@ Live performance. Stability and low latency are first-class requirements.
 
 Early development. See [CHANGELOG.md](CHANGELOG.md) for current state.
 
+## Documentation
+
+- [Standards](docs/STANDARDS.md) — coding standards, Definition of Done
+- [Design](docs/explanation/design.md) — why it's built this way
+- [ADRs](docs/reference/ADR/) — architecture decisions
+- [Contributing](CONTRIBUTING.md) — how to contribute
+- [Tasks](TASKS.md) — open work + known trade-offs
+
+## Safety Notice
+
+Chromaticity renders audio-reactive visuals. At certain frequencies and contrast levels, such visuals can trigger seizures in people with photosensitive epilepsy. A photosensitive safety mode (flicker-rate limiting) is planned for Phase 2. Until then: use with care in public-facing contexts.
+
 ## Contributors
 
-- Xavier (lab infrastructure, Python/ML)
-- Fletcher Hammond (perceptual science, DnB domain expertise)
+- Xavier Murrell (lab infrastructure, Python/ML)
+- Fletcher Hammond (perceptual science, music domain expertise)
 - Prometheus (research, architecture, build)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 
 ## License
 
