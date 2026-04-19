@@ -52,4 +52,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 
 ## License
 
-MIT
+MIT (see `LICENSE`). All dependencies are MIT/BSD/ISC/Apache-2.0 permissive licenses. No GPL, AGPL, LGPL, or non-commercial-restricted components. See `docs/reference/ADR/ADR-003-mit-permissive-licensing.md` for rationale.

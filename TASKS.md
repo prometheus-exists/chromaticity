@@ -4,6 +4,9 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 
 ## Open
 
+- [ ] **Implement real-time onset detector** (SuperFlux-style, ~200-300 LOC) — prerequisite for Phase 2, clean-room implementation per ADR-003
+- [ ] **Implement real-time tempo tracker** (autocorrelation on onset history) — prerequisite for Phase 2
+- [ ] Validate custom beat detection against librosa baseline on brotherdurry-constancy.mp3
 - [ ] Phase 1: Render-probe uniform analyser (see design doc, docs/reference/ADR/ADR-001)
 - [ ] Phase 2: Live audio-reactive runtime
 - [ ] Phase 3: CMC-principled mapping integration
@@ -29,6 +32,8 @@ None yet. When a test gets `--ignore`, add entry here with owner + target fix da
 
 ## Known trade-offs
 
-- AGPL ShaderFlow is studied for architecture but not vendored (we're MIT; can't absorb AGPL code)
-- madmom has NC-licensed models — use offline only, never in distribution
-- aubio is GPL — we depend on it but don't redistribute it; users install via uv
+- **Licensing**: MIT-permissive only. See ADR-003. No GPL/AGPL/NC deps.
+- AGPL ShaderFlow is studied for architecture only — no code absorbed, no dependency
+- madmom models are NC-licensed — never used, not even for offline analysis
+- aubio is GPL — removed from dependencies; we implement onset/beat detection ourselves (ADR-003)
+- librosa (ISC) replaces aubio for offline analysis; real-time path is custom (SuperFlux-style)

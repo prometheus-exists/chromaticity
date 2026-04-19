@@ -29,10 +29,13 @@ Most Shadertoy shaders are visually stunning but not audio-reactive. The barrier
 - **Platform: macOS + Windows co-primary**. Every feature works on both or doesn't ship. CI tests both.
 
 ### Audio pipeline
-- `sounddevice` — audio capture
-- `aubio` — beat detection, onset detection
+- `sounddevice` (MIT) — audio capture
 - `numpy` FFT — spectral analysis
+- **Custom real-time onset detection** (SuperFlux-style, Böck et al. 2013) — spectral flux with adaptive thresholding
+- **Custom real-time tempo tracking** — autocorrelation over onset history
+- `librosa` (ISC) — **offline analysis only** (test suite validation, not the live path)
 - Target: <1ms from capture to feature vector
+- See ADR-003 for why we implement these ourselves (MIT-permissive dependency policy)
 
 ### Uniform inference: render-probe
 See ADR-001. Sweep → observe → profile → cache. No LLM in critical path.

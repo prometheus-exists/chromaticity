@@ -10,6 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Scaffold: README, STANDARDS.md (now at `docs/STANDARDS.md`), CHANGELOG, pyproject.toml
 - ADR-001: Render-probe for uniform semantic inference
 - ADR-002: Pre-process / live runtime split architecture
+- ADR-003: MIT-permissive licensing — no GPL/AGPL/NC dependencies. Aubio removed; custom beat detection required.
 - Design document (`docs/explanation/design.md`) with CMC mapping table + phase plan
 - References directory with prior-art repos tiered by relevance
 - Academic prior-art review (Hermes, 2026-04-19) covering CMC, temporal binding, groove, embodied cognition, chromesthesia
@@ -28,6 +29,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Platform targets elevated: macOS + Windows are **co-primary**, not primary + supported
 - Colour control model: three-tier (auto/suggested/manual) — addresses CMC individual variation
 - Scope: explicitly genre-agnostic (high-tempo handling is adaptive, not DnB-specific)
+- **Dependencies swapped for licensing**: aubio (GPL) removed; librosa (ISC) for offline analysis; real-time onset/beat detection to be implemented in-house (SuperFlux-style, ADR-003)
 
 ### Planned
 - Phase 1: Render-probe uniform analyser
