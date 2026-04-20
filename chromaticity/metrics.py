@@ -1,12 +1,20 @@
 import numpy as np
 
 
+def _sanitise(frame_rgba: np.ndarray) -> np.ndarray:
+    """Replace NaN/Inf with 0.0 and clamp to [0,1]. Needed for shaders with
+    divide-by-zero or 0/0 in their math (e.g. reflective tunnel shaders)."""
+    out = np.nan_to_num(frame_rgba, nan=0.0, posinf=1.0, neginf=0.0)
+    return np.clip(out, 0.0, 1.0)
+
+
 def compute_luminance(frame_rgba: np.ndarray) -> np.ndarray:
     """frame_rgba: (H, W, 4) float32 0-1. Returns (H, W) luminance."""
+    f = _sanitise(frame_rgba)
     return (
-        0.2126 * frame_rgba[:, :, 0]
-        + 0.7152 * frame_rgba[:, :, 1]
-        + 0.0722 * frame_rgba[:, :, 2]
+        0.2126 * f[:, :, 0]
+        + 0.7152 * f[:, :, 1]
+        + 0.0722 * f[:, :, 2]
     )
 
 
@@ -14,8 +22,8 @@ def compute_cielab_stats(frame_rgba: np.ndarray) -> dict:
     """Returns dict with mean_L, mean_a, mean_b, std_a, std_b, mean_chroma."""
     from skimage.color import rgb2lab
 
-    # H1 fix: clamp to [0,1] — f4 renderbuffer is unclamped; HDR shaders can exceed 1.0
-    rgb = np.clip(frame_rgba[:, :, :3], 0.0, 1.0)
+    # H1 fix + NaN guard: sanitise before conversion
+    rgb = _sanitise(frame_rgba)[:, :, :3]
     lab = rgb2lab(rgb)
     a, b = lab[:, :, 1], lab[:, :, 2]
     return {

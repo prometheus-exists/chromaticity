@@ -18,7 +18,7 @@ def _wrap_shadertoy(frag_source: str, width: int, height: int) -> str:
     source_clean = re.sub(r'^\s*#version\s+.*$', '', frag_source, flags=re.MULTILINE).strip()
     # iResolution is vec3(width, height, pixel_aspect) per Shadertoy spec
     # iTimeDelta, iFrame, iMouse declared to avoid compile errors in shaders that reference them
-    return f"""#version 330
+    return f"""#version 410
 uniform float iTime;
 uniform float iTimeDelta;
 uniform int iFrame;
