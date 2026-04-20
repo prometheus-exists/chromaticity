@@ -24,6 +24,10 @@ uniform float iTimeDelta;
 uniform int iFrame;
 uniform vec3 iResolution;
 uniform vec4 iMouse;
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
+uniform sampler2D iChannel2;
+uniform sampler2D iChannel3;
 out vec4 fragColor;
 {source_clean}
 void main() {{
@@ -85,6 +89,18 @@ def render_frames(
     if "iMouse" in prog:
         prog["iMouse"].value = (0.0, 0.0, 0.0, 0.0)
 
+    # Stub textures for iChannel0-3: 1×1 mid-grey RGBA so texture-sampling shaders
+    # compile and render (they won't look correct, but metrics will be non-zero)
+    stub_data = np.array([[[128, 128, 128, 255]]], dtype=np.uint8)
+    stub_textures = []
+    for ch in range(4):
+        uniform_name = f"iChannel{ch}"
+        if uniform_name in prog:
+            tex = ctx.texture((1, 1), 4, stub_data.tobytes())
+            tex.use(location=ch)
+            prog[uniform_name].value = ch
+            stub_textures.append(tex)
+
     frames = []
     deadline = time.time() + timeout_seconds
 
@@ -104,5 +120,7 @@ def render_frames(
         frame = np.flipud(frame)
         frames.append(frame)
 
+    for tex in stub_textures:
+        tex.release()
     ctx.release()
     return frames, None
