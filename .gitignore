@@ -47,3 +47,7 @@ profiles/
 
 # Internal Codex briefs
 docs/phase1-codex-brief*.md
+
+# Virtual environment
+.venv/
+venv/
