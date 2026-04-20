@@ -15,10 +15,15 @@ def _wrap_shadertoy(frag_source: str, width: int, height: int) -> str:
     """Wrap Shadertoy mainImage into a standard fragment shader."""
     # Strip any existing #version directive from the source — we inject our own
     import re
-    source_clean = re.sub(r'^\s*#version\s+\S+\s*$', '', frag_source, flags=re.MULTILINE).strip()
+    source_clean = re.sub(r'^\s*#version\s+.*$', '', frag_source, flags=re.MULTILINE).strip()
+    # iResolution is vec3(width, height, pixel_aspect) per Shadertoy spec
+    # iTimeDelta, iFrame, iMouse declared to avoid compile errors in shaders that reference them
     return f"""#version 330
 uniform float iTime;
-uniform vec2 iResolution;
+uniform float iTimeDelta;
+uniform int iFrame;
+uniform vec3 iResolution;
+uniform vec4 iMouse;
 out vec4 fragColor;
 {source_clean}
 void main() {{
@@ -72,17 +77,25 @@ def render_frames(
     fbo.use()
 
     if "iResolution" in prog:
-        prog["iResolution"].value = (float(width), float(height))
+        prog["iResolution"].value = (float(width), float(height), 1.0)  # vec3: w, h, pixel_aspect
+    if "iTimeDelta" in prog:
+        prog["iTimeDelta"].value = 0.0
+    if "iFrame" in prog:
+        prog["iFrame"].value = 0
+    if "iMouse" in prog:
+        prog["iMouse"].value = (0.0, 0.0, 0.0, 0.0)
 
     frames = []
     deadline = time.time() + timeout_seconds
 
-    for itime in itime_values:
+    for frame_idx, itime in enumerate(itime_values):
         if time.time() > deadline:
             frames.append(None)
             continue
         if "iTime" in prog:
             prog["iTime"].value = float(itime)
+        if "iFrame" in prog:
+            prog["iFrame"].value = frame_idx
         ctx.clear()
         vao.render()
         raw = fbo.read(components=4, dtype='f4', attachment=0)
