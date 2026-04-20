@@ -7,7 +7,7 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 - [ ] **Implement real-time onset detector** (SuperFlux-style, ~200-300 LOC) — prerequisite for Phase 2, clean-room implementation per ADR-003
 - [ ] **Implement real-time tempo tracker** (autocorrelation on onset history) — prerequisite for Phase 2
 - [ ] Validate custom beat detection against librosa baseline on brotherdurry-constancy.mp3
-- [ ] Phase 1: Render-probe uniform analyser (see design doc, docs/reference/ADR/ADR-001)
+- [x] Phase 1: Render-probe uniform analyser ✅ 2026-04-20 — CLI + profile schema v1.0, 7-shader suite profiled, noise floor calibrated, all Hermes review findings fixed (v0.2.1)
 - [ ] Phase 2: Live audio-reactive runtime
 - [ ] Phase 3: CMC-principled mapping integration
 - [ ] Phase 4: UX layer (shader library, mapping editor, performance mode)
@@ -26,6 +26,17 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 - [ ] Individual CMC calibration layer — research-interesting, not v1
 - [ ] Shadertoy marketplace integration — API exists, may be useful later
 - [ ] **"GLSL for Perception Scientists" blog post** — Fletcher-led, publishable on a lab blog / personal site. High value for an underexplored intersection. Source the 1-pager version from Hermes's F3 finding; expand with visual examples. Xavier flagged this 2026-04-19.
+
+## Phase 1 findings (inform Phase 2 design)
+
+- **Three shader archetypes identified** (2026-04-20): colour-dominated (XtK3W3, colour score 1.20), motion-dominated (7cBSDR, dissim 0.975), balanced (3sySRK, both mid-range). Natural taxonomy for curation layer.
+- **Texture-dependent shaders (NddSWs, sc2XDR)**: all metrics zero with stub texture — need real texture pipeline, flag as Phase 4 scope.
+- **Dsf3WH is near-monochrome**: colour score ~0, all variation is luminance-based. Suitable for motion-only reactive mapping only.
+- **Colour velocity ≠ emotional velocity** (Fletcher Hammond 2026-04-20): a cycling palette is high velocity but periodic — the emotional register rotates, it doesn’t climb. Proxy metric needs revision before Exp 4. Candidate: derivative of perceptual surprise (deviation from predicted pattern) rather than raw chroma delta.
+- **Per-shader mapping is mandatory** (confirmed): 3sySRK colour sensitivity ~10× higher than 7cBSDR. Universal mapping would overdrive one or underwhelm the other.
+- **Irregular colour velocity in 7cBSDR** (spikes t=2s, t=7s, near-zero t=8s): emergent from depth-time interference in the raymarcher. May create natural dialogue with music rhythm — or fight it. Open question for Phase 2 testing.
+- **Feedback shaders**: probe infrastructure ready (ping-pong FBO, warmup frames), but no feedback shader profiled yet. Path-dependent profile expected — feedback shader state history affects every frame. Phase 2 must treat these differently.
+- **Both auto beat-sync and manual override required** in Phase 2 mapping layer (Xavier + Fletcher 2026-04-20). Two modes: locked (follows detected beats) and free (user drives iTime directly).
 
 ## Design ideas (not yet scoped, not yet architectural decisions)
 

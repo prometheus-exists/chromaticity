@@ -13,6 +13,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
 
+## [0.2.1] — 2026-04-20
+
+### Fixed
+- **C1**: Error path in `probe.py` crashed on `min([])` when `render_frames` returned empty list — now short-circuits to valid empty profile
+- **C2**: `save_profile` used default `allow_nan=True` — switched to `allow_nan=False` (RFC 7159 compliance); NaN in output now raises immediately rather than writing corrupt JSON
+- **H1**: `compute_cielab_stats` passed unclamped float32 renderbuffer to `rgb2lab` — added `np.clip([0,1])` + `nan_to_num` guard; HDR and divide-by-zero shaders now produce valid metrics instead of NaN propagation
+- **H2**: `motion.sensitivity_score` was set equal to `mean_dissimilarity` — now uses `sensitivity_score()` formula for consistency with luminance/colour dimensions
+- **M2**: `test_compilation_gate` lacked `importorskip("moderngl")` guard and weak assertions — now requires moderngl, verifies valid JSON written, verifies empty metrics on error path
+- **GL version**: Bumped wrapper from `#version 330` to `#version 410` (matches available GL 4.1 context; required by some shaders using modern GLSL features)
+- **7cBSDR desktop GL compat**: Shader used uninitialised variables (`float i,t,v,l` + `O*=i`) which WebGL zero-initialises but desktop GL leaves undefined — added explicit `i=0.,t=0.,v=0.,l=0.` and `O=vec4(0.0)` initialisation
+- **iChannel0-3 stub textures**: Texture-sampling shaders (`NddSWs`, `sc2XDR`, `XtK3W3`) failed to compile due to undeclared `iChannel0` identifier — renderer now declares `sampler2D iChannel0-3` uniforms and binds 1×1 mid-grey stub textures
+
+### Removed
+- **XdycWG**: Retired from test suite — CC BY-NC-SA licence (non-commercial only), HLSL non-standard functions (`saturate`, `acesToneMapping`), multi-pass Image-only shader with no standalone render path
+
+### Changed
+- `compute_luminance` and `compute_cielab_stats` now share `_sanitise()` helper for consistent NaN/Inf handling across all metrics
+
+---
+
 ## [0.2.0] — 2026-04-20
 
 ### Added
