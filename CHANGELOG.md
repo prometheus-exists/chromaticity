@@ -6,39 +6,48 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Planned
+- Phase 2: Live audio-reactive runtime (custom onset/beat detector, <5ms live path)
+- Phase 3: CMC-principled mapping integration (Palmer 2013 emotion-mediated colour)
+- Phase 4: UX (shader library, mapping editor, setlist-prep mode, performance mode)
+
+---
+
+## [0.2.0] — 2026-04-20
+
 ### Added
-- Scaffold: README, STANDARDS.md (now at `docs/STANDARDS.md`), CHANGELOG, pyproject.toml
+- **Phase 1: Render-probe uniform analyser** (`chromaticity/probe.py`) — CLI + orchestrator
+- Profile JSON schema v1.0 (`chromaticity/profile.py`, ADR-003) — CIELAB colour distribution, SSIM motion, `colour_velocity` for emotional velocity hypothesis
+- GLSL static parser (`chromaticity/glsl_parser.py`) — uniform extraction, ichannel0 detection, feedback loop detection
+- Frame metrics (`chromaticity/metrics.py`) — CIELAB via skimage, SSIM dissimilarity, luminance, sensitivity scoring
+- Offscreen moderngl renderer (`chromaticity/renderer.py`) — timeout watchdog, Shadertoy dialect wrapping, float32 FBO
+- Phase 1 test suite (`tests/test_probe.py`) — schema validation, negative case noise-floor calibration, compilation gate, single-pass responsiveness
+- ADR-003: Mapping profile JSON schema — data contract between render-probe (Phase 1) and live runtime (Phase 2+)
+- Test shader suite (8 shaders): `3sySRK`, `7cBSDR`, `Dsf3WH`, `sc2XDR`, `NddSWs`, `XdycWG`, `XtK3W3`, `negative_test` — covering stateless, multi-pass, feedback loop, and static negative case
+- `scikit-image>=0.22` dependency (MIT) for CIELAB conversion and SSIM
+
+---
+
+## [0.1.0] — 2026-04-19
+
+### Added
+- Scaffold: README, `docs/STANDARDS.md`, CHANGELOG, pyproject.toml, LICENSE (MIT)
 - ADR-001: Render-probe for uniform semantic inference
 - ADR-002: Pre-process / live runtime split architecture
-- ADR-003: MIT-permissive licensing — no GPL/AGPL/NC dependencies. Aubio removed; custom beat detection required.
-- ADR-004: Mapping profile JSON schema (v0.1.0) — data contract between render-probe and live runtime, Fletcher-editable
-- ADR-005: Shader security & photosensitivity model — three-layer containment (subprocess isolation + live budgets + safety-by-default), WCAG 2.3 compliant
-- ADR-006: Render-probe three-stage inference pipeline — name heuristic → source analysis → render-probe (with explicit timeboxes)
-- Tutorial: `docs/tutorials/glsl-for-perception-scientists.md` — 10-minute crash course for non-shader-devs
-- Reference: `docs/reference/vocabulary.md` — shared glossary across perception, GLSL, and music
-- How-to: `docs/how-to/non-code-contribution.md` — contribution paths that don't require Python
+- ADR-004 (formerly ADR-003 draft): MIT-permissive licensing — aubio (GPL) removed; custom beat detection required
+- ADR-005: Shader security & photosensitivity model — three-layer containment, WCAG 2.3 compliant
+- ADR-006: Render-probe three-stage inference pipeline
+- Tutorial: `docs/tutorials/glsl-for-perception-scientists.md`
+- Reference: `docs/reference/vocabulary.md` — shared glossary
+- How-to: `docs/how-to/non-code-contribution.md`
 - Design document (`docs/explanation/design.md`) with CMC mapping table + phase plan
-- References directory with prior-art repos tiered by relevance
-- Academic prior-art review (Hermes, 2026-04-19) covering CMC, temporal binding, groove, embodied cognition, chromesthesia
-- `.gitattributes`: enforce LF line endings across platforms
-- LICENSE (MIT)
-- CONTRIBUTING.md with philosophy + standards + live-performance safety rules
-- TASKS.md for tracking open work + known trade-offs
-- Diátaxis documentation structure (`docs/{tutorials,how-to,reference,explanation}/`)
-- `.pre-commit-config.yaml` for local dev (ruff, black, standard hooks)
-- GitHub Actions CI: macOS + Windows, Python 3.11 + 3.12 matrix
-- Issue templates (bug report, feature request) + PR template
-- Photosensitive epilepsy safety notice in README + STANDARDS accessibility section
+- Academic prior-art review (Hermes) covering CMC, temporal binding, groove, embodied cognition
+- `.gitattributes`, `.pre-commit-config.yaml`, GitHub Actions CI (macOS + Windows, Python 3.11/3.12)
+- Issue templates + PR template
+- CONTRIBUTING.md, TASKS.md
 
 ### Changed
-- STANDARDS.md moved from project root to `docs/STANDARDS.md` (Lab Workflow convention)
-- Platform targets elevated: macOS + Windows are **co-primary**, not primary + supported
-- Colour control model: three-tier (auto/suggested/manual) — addresses CMC individual variation
-- Scope: explicitly genre-agnostic (high-tempo handling is adaptive, not DnB-specific)
-- **Dependencies swapped for licensing**: aubio (GPL) removed; librosa (ISC) for offline analysis; real-time onset/beat detection to be implemented in-house (SuperFlux-style, ADR-003)
-
-### Planned
-- Phase 1: Render-probe uniform analyser
-- Phase 2: Live audio-reactive runtime
-- Phase 3: CMC-principled mapping integration
-- Phase 4: UX (shader library, mapping editor, performance mode)
+- Platform targets: macOS + Windows co-primary
+- Colour control: three-tier (auto/suggested/manual)
+- Scope: explicitly genre-agnostic
+- Dependencies: aubio → librosa + custom real-time implementation

@@ -40,3 +40,10 @@ test-audio/*.aif
 test-audio/*.aiff
 test-audio/*.m4a
 test-audio/*.ogg
+
+# Generated probe profiles (large, reproducible)
+profiles/
+*.json.tmp
+
+# Internal Codex briefs
+docs/phase1-codex-brief*.md

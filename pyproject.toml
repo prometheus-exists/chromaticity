@@ -1,6 +1,6 @@
 [project]
 name = "chromaticity"
-version = "0.1.0"
+version = "0.2.0"
 description = "Perceptually-principled audio-reactive visualiser for live music performance"
 readme = "README.md"
 license = { text = "MIT" }
@@ -8,6 +8,7 @@ requires-python = ">=3.11"
 dependencies = [
     "moderngl>=5.10",  # BSD
     "numpy>=1.26",  # BSD
+    "scikit-image>=0.22",
     "sounddevice>=0.4",  # MIT
     "librosa>=0.10",  # ISC (offline analysis only; real-time path uses custom implementation)
 ]

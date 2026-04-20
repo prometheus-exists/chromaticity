@@ -13,12 +13,14 @@ void main() { gl_Position = vec4(in_vert, 0.0, 1.0); }
 
 def _wrap_shadertoy(frag_source: str, width: int, height: int) -> str:
     """Wrap Shadertoy mainImage into a standard fragment shader."""
-    return f"""
-#version 330
+    # Strip any existing #version directive from the source — we inject our own
+    import re
+    source_clean = re.sub(r'^\s*#version\s+\S+\s*$', '', frag_source, flags=re.MULTILINE).strip()
+    return f"""#version 330
 uniform float iTime;
 uniform vec2 iResolution;
 out vec4 fragColor;
-{frag_source}
+{source_clean}
 void main() {{
     mainImage(fragColor, gl_FragCoord.xy);
 }}
@@ -60,26 +62,13 @@ def render_frames(
         return [], str(e)
 
     vbo = ctx.buffer(
-        np.array(
-            [
-                -1.0,
-                -1.0,
-                1.0,
-                -1.0,
-                -1.0,
-                1.0,
-                1.0,
-                -1.0,
-                -1.0,
-                1.0,
-                1.0,
-                1.0,
-            ],
-            dtype="f4",
-        )
+        np.array([
+            -1.0, -1.0,  1.0, -1.0, -1.0,  1.0,
+             1.0, -1.0, -1.0,  1.0,  1.0,  1.0,
+        ], dtype="f4")
     )
-    vao = ctx.simple_vertex_array(prog, vbo, "in_vert")
-    fbo = ctx.simple_framebuffer((width, height))
+    vao = ctx.vertex_array(prog, [(vbo, '2f', 'in_vert')])
+    fbo = ctx.framebuffer(color_attachments=[ctx.renderbuffer((width, height), 4, dtype='f4')])
     fbo.use()
 
     if "iResolution" in prog:
@@ -96,8 +85,10 @@ def render_frames(
             prog["iTime"].value = float(itime)
         ctx.clear()
         vao.render()
-        raw = fbo.read(components=4, dtype="f4")
+        raw = fbo.read(components=4, dtype='f4', attachment=0)
         frame = np.frombuffer(raw, dtype=np.float32).reshape(height, width, 4)
+        # Flip vertically — OpenGL origin is bottom-left, images expect top-left
+        frame = np.flipud(frame)
         frames.append(frame)
 
     ctx.release()
