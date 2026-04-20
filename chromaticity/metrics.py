@@ -14,7 +14,9 @@ def compute_cielab_stats(frame_rgba: np.ndarray) -> dict:
     """Returns dict with mean_L, mean_a, mean_b, std_a, std_b, mean_chroma."""
     from skimage.color import rgb2lab
 
-    lab = rgb2lab(frame_rgba[:, :, :3])
+    # H1 fix: clamp to [0,1] — f4 renderbuffer is unclamped; HDR shaders can exceed 1.0
+    rgb = np.clip(frame_rgba[:, :, :3], 0.0, 1.0)
+    lab = rgb2lab(rgb)
     a, b = lab[:, :, 1], lab[:, :, 2]
     return {
         "mean_L": float(lab[:, :, 0].mean()),

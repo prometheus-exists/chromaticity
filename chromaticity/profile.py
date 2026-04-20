@@ -65,8 +65,10 @@ class ShaderProfile(TypedDict):
 
 
 def save_profile(profile: ShaderProfile, path: str) -> None:
+    # C2 fix: allow_nan=False — NaN/Inf is invalid per RFC 7159;
+    # surfaces bugs immediately rather than writing silently corrupt JSON
     with open(path, "w") as f:
-        json.dump(profile, f, indent=2)
+        json.dump(profile, f, indent=2, allow_nan=False)
 
 
 def load_profile(path: str) -> ShaderProfile:

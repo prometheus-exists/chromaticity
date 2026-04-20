@@ -61,12 +61,18 @@ def test_negative_case(tmp_path):
 
 
 def test_compilation_gate(tmp_path):
-    """Broken GLSL must set flags.compilation_error and not raise."""
+    """Broken GLSL must set flags.compilation_error, not raise, and write valid JSON."""
+    pytest.importorskip("moderngl")  # M2 fix: needs moderngl to attempt compilation
     broken = tmp_path / "broken.glsl"
     broken.write_text(BROKEN_GLSL)
     out = str(tmp_path / "broken.json")
     profile = _run_probe(str(broken), out, itime_end=2.0, itime_step=1.0)
     assert profile["flags"]["compilation_error"] is not None
+    # C2 fix verification: output file must be valid JSON (no NaN)
+    with open(out) as f:
+        loaded = json.load(f)  # would raise if NaN written
+    assert loaded["flags"]["compilation_error"] is not None
+    assert loaded["itime_sensitivity"]["luminance"]["mean"] == []
 
 
 def test_single_pass_responsive(tmp_path):

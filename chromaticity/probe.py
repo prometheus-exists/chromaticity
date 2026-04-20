@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import json
 import os
 
 import numpy as np
@@ -14,6 +15,14 @@ from .metrics import (
 )
 from .profile import ShaderProfile, save_profile
 from .renderer import render_frames
+
+_EMPTY_LUMINANCE = {"mean": [], "std": 0.0, "range": [0.0, 0.0], "sensitivity_score": 0.0}
+_EMPTY_COLOUR = {
+    "mean_L": [], "mean_a": [], "mean_b": [],
+    "std_a": [], "std_b": [], "mean_chroma": [],
+    "colour_velocity": [], "sensitivity_score": 0.0,
+}
+_EMPTY_MOTION = {"ssim_dissimilarity": [], "mean_dissimilarity": 0.0, "sensitivity_score": 0.0}
 
 
 def probe_shader(
@@ -40,8 +49,46 @@ def probe_shader(
 
     frames, error = render_frames(source, itime_values, resolution=resolution)
 
-    lum_series, lab_series, dissim_series = [], [], []
+    # --- C1/C2 fix: short-circuit on error (empty frames) ---
+    if error is not None or not frames:
+        profile: ShaderProfile = {
+            "schema_version": "1.0",
+            "shader_id": shader_id,
+            "shader_path": shader_path,
+            "probe_date": datetime.datetime.utcnow().isoformat(),
+            "probe_config": {
+                "resolution": list(resolution),
+                "itime_start": itime_start,
+                "itime_end": itime_end,
+                "itime_step": itime_step,
+                "warmup_frames": 0,
+                "multi_pass": multi_pass,
+                "feedback_loop": feedback,
+            },
+            "itime_sensitivity": {
+                "luminance": _EMPTY_LUMINANCE,
+                "colour": _EMPTY_COLOUR,
+                "motion": _EMPTY_MOTION,
+            },
+            "uniforms_detected": uniform_names,
+            "flags": {
+                "multi_pass": multi_pass,
+                "feedback_loop": feedback,
+                "needs_ichannel0": ichannel0,
+                "compilation_error": error,
+                "warmup_frames_used": 0,
+                "sweep_complete": False,
+                "possibly_incomplete": False,
+            },
+        }
+        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+        # C2 fix: explicit NaN guard — raise immediately rather than write corrupt JSON
+        save_profile(profile, output_path)
+        print(f"Profile written (error): {output_path}")
+        return profile
 
+    # --- Normal path ---
+    lum_series, lab_series, dissim_series = [], [], []
     valid_frames = [f for f in frames if f is not None]
     sweep_complete = len(valid_frames) == n
 
@@ -63,12 +110,20 @@ def probe_shader(
     mean_l = [s["mean_L"] if s else 0.0 for s in lab_series]
     mean_a = [s["mean_a"] if s else 0.0 for s in lab_series]
     mean_b = [s["mean_b"] if s else 0.0 for s in lab_series]
-    std_a = [s["std_a"] if s else 0.0 for s in lab_series]
-    std_b = [s["std_b"] if s else 0.0 for s in lab_series]
+    std_a  = [s["std_a"]  if s else 0.0 for s in lab_series]
+    std_b  = [s["std_b"]  if s else 0.0 for s in lab_series]
     chroma = [s["mean_chroma"] if s else 0.0 for s in lab_series]
-    vel = [0.0] + [abs(chroma[i] - chroma[i - 1]) for i in range(1, len(chroma))]
+    vel    = [0.0] + [abs(chroma[i] - chroma[i - 1]) for i in range(1, len(chroma))]
 
-    profile: ShaderProfile = {
+    # L1 fix: guard std for single-sample sweeps
+    lum_arr = np.array(lum_clean)
+    lum_std = float(np.std(lum_arr)) if len(lum_arr) > 1 else 0.0
+    lum_range = [float(lum_arr.min()), float(lum_arr.max())] if len(lum_arr) > 0 else [0.0, 0.0]
+
+    # H2 fix: motion sensitivity_score uses same formula as luminance/colour
+    dissim_tail = dissim_series[1:] if len(dissim_series) > 1 else []
+
+    profile = {
         "schema_version": "1.0",
         "shader_id": shader_id,
         "shader_path": shader_path,
@@ -85,8 +140,8 @@ def probe_shader(
         "itime_sensitivity": {
             "luminance": {
                 "mean": lum_clean,
-                "std": float(np.std(lum_clean)),
-                "range": [float(min(lum_clean)), float(max(lum_clean))],
+                "std": lum_std,
+                "range": lum_range,
                 "sensitivity_score": sensitivity_score(lum_clean),
             },
             "colour": {
@@ -101,12 +156,9 @@ def probe_shader(
             },
             "motion": {
                 "ssim_dissimilarity": dissim_series,
-                "mean_dissimilarity": float(np.mean(dissim_series[1:]))
-                if len(dissim_series) > 1
-                else 0.0,
-                "sensitivity_score": float(np.mean(dissim_series[1:]))
-                if len(dissim_series) > 1
-                else 0.0,
+                "mean_dissimilarity": float(np.mean(dissim_tail)) if dissim_tail else 0.0,
+                # H2 fix: use same sensitivity_score formula, not mean_dissimilarity
+                "sensitivity_score": sensitivity_score(dissim_tail) if dissim_tail else 0.0,
             },
         },
         "uniforms_detected": uniform_names,
