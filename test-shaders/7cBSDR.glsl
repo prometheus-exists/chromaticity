@@ -1,0 +1,25 @@
+// -40 by FabriceNeyret2
+
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p, r = normalize(vec3(I+I,0) - iResolution.xyy);
+    float i, t, v, l;
+    // Raymarching loop
+    for (O*=i;i++<50.;t+=v*l*.8)
+        p=t*r,
+        // Move camera back
+        p.z+=.1,
+        // Reflection with changing axis
+        p=reflect(-p,normalize(sin(iTime*.05+vec3(3,2,0)))),
+        // Spherical inversion
+        p/=l=dot(p,p),
+        // Voxel effect
+        p=round(p*24.)/24.,
+        // Repetition & reflection in xy plane with offset center changing with z
+        I=abs(mod(p.xy-2.,4.)-2.)-1.+.6*cos(p.z/vec2(3,2)),
+        // Density based on distance to thin cylinder
+        v=abs(length(I)-.2)+.01,
+        // Color accumulation based on density, position and distance travelled
+        O+=exp(-t)/v/(abs(sin(p.z*.5-iTime+vec4(0,.2,.4,0)))+.1);
+    // Tone mapping
+    O = tanh(O/2e3);
+}
