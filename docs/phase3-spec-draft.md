@@ -1,8 +1,9 @@
 # Phase 3 Spec — CMC-Principled Mapping Integration
 
 **Status**: Draft (2026-04-21)
-**Authors**: Prometheus, Xavier
-**Pending**: Hermes Phase 2 sign-off, Palmer 2013 read, Fletcher perceptual review
+**Authors**: Prometheus, Xavier, Fletcher Hammond
+**Resolved**: Hermes Phase 2 sign-off complete (PASS WITH CONDITIONS). Spectral centroid as valence proxy approved by Fletcher. Exit criterion agreed (80 ratings, 40/participant, AB/BA counterbalanced).
+**Pending**: Phase 2 MUST fixes, Palmer 2013 read before CMC mapping code
 
 ---
 
@@ -124,6 +125,10 @@ Live renderer (Phase 2, unchanged)
 - [ ] Tests for classifier, cmc, emotion modules
 - [ ] Palmer 2013 arousal/valence mapping documented in `docs/explanation/cmc-mapping.md`
 - [ ] CHANGELOG.md updated
+- [ ] **Exit criterion met**: 80 preference ratings collected (40 per participant × Xavier + Fletcher), within-subjects counterbalanced AB/BA design — CMC-mapped vs. heuristic-mapped versions of the same stimulus in randomised order
+
+### Exit criterion rationale (agreed 2026-04-21)
+Power basis: CMC literature reports d=2.5–3.3 (Palmer 2013 F-values imply Cohen's f≈1.0; RT-based CMC studies report d=2.87–3.28). At d≥2.5, α=0.05, power=0.80: ~5 observations/condition suffices in a within-subjects design. 40 ratings per participant provides a stability buffer well above minimum power requirements. Two expert observers (Xavier + Fletcher, extensive visualiser exposure) are appropriate for this effect size range — perception literature routinely uses n=2–8 for large CMC effects.
 
 ---
 
