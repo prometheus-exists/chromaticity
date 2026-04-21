@@ -38,7 +38,7 @@ def test_run_live_headless_smoke(monkeypatch):
     )
     monkeypatch.setattr(
         "chromaticity.live._create_audio_source",
-        lambda audio_device: (_FakeAudioSource(), None),
+        lambda audio_device, min_bpm=60.0, max_bpm=200.0: (_FakeAudioSource(), None),
     )
 
     stats = run_live(

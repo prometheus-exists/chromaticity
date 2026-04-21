@@ -171,4 +171,17 @@ class UniformMapper:
             return UniformMapping(audio_feature="tempo")
         if re.search(r"(amp|loud|gain|energy|level|volume)", lowered):
             return UniformMapping(audio_feature="rms")
+        # Frequency-split heuristics (Fletcher's insight: lows=slow, highs=fast)
+        # Low-frequency / bass-heavy names → sub_bass band (kick, slow movers)
+        if re.search(r"(bass|kick|sub|low|deep|throb|pulse|thump)", lowered):
+            return UniformMapping(audio_feature="band_0", smoothing=0.85)  # heavy smoothing = slow response
+        # High-frequency names → presence/air bands (hi-hats, fast detail)
+        if re.search(r"(high|treble|crisp|air|detail|shimmer|sparkle|bright|sharp|edge)", lowered):
+            return UniformMapping(audio_feature="band_6", smoothing=0.1)   # low smoothing = fast response
+        # Mid/snare names → onset strength (snappy transients)
+        if re.search(r"(mid|snare|hit|snap|crack|punch|attack|transient)", lowered):
+            return UniformMapping(audio_feature="onset_strength", smoothing=0.3)
+        # Brightness / luminance → broadband RMS
+        if re.search(r"(bright|glow|lum|light|bloom|shine)", lowered):
+            return UniformMapping(audio_feature="rms", smoothing=0.5)
         return UniformMapping(audio_feature="iTime")
