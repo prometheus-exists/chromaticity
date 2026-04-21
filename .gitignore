@@ -41,8 +41,9 @@ test-audio/*.aiff
 test-audio/*.m4a
 test-audio/*.ogg
 
-# Generated probe profiles (large, reproducible)
+# Generated probe profiles and frame dumps (large, reproducible)
 profiles/
+test-shaders/probes/
 *.json.tmp
 
 # Internal Codex briefs
