@@ -4,12 +4,19 @@ from dataclasses import dataclass
 
 SHADERTOY_BUILTINS = {
     "iTime",
+    "iTimeDelta",
+    "iFrame",
+    "iFrameRate",
     "iResolution",
     "iMouse",
+    "iDate",
+    "iSampleRate",
     "iChannel0",
     "iChannel1",
     "iChannel2",
     "iChannel3",
+    "iChannelTime",
+    "iChannelResolution",
 }
 
 

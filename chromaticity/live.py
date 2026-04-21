@@ -79,9 +79,6 @@ class HeadlessBackend:
             color_attachments=[self._ctx.renderbuffer((width, height), 4, dtype="f4")]
         )
         self._textures = self._bind_stub_textures()
-        self._fbo = self._ctx.framebuffer(
-            color_attachments=[self._ctx.renderbuffer((width, height), 4, dtype="f4")]
-        )
         self._set_builtin_uniforms(frame_index=0, delta_seconds=0.0)
 
     def _bind_stub_textures(self) -> list[object]:

@@ -55,7 +55,7 @@ def probe_shader(
             "schema_version": "1.0",
             "shader_id": shader_id,
             "shader_path": shader_path,
-            "probe_date": datetime.datetime.utcnow().isoformat(),
+            "probe_date": datetime.datetime.now(datetime.UTC).isoformat(),
             "probe_config": {
                 "resolution": list(resolution),
                 "itime_start": itime_start,
@@ -127,7 +127,7 @@ def probe_shader(
         "schema_version": "1.0",
         "shader_id": shader_id,
         "shader_path": shader_path,
-        "probe_date": datetime.datetime.utcnow().isoformat(),
+        "probe_date": datetime.datetime.now(datetime.UTC).isoformat(),
         "probe_config": {
             "resolution": list(resolution),
             "itime_start": itime_start,

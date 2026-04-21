@@ -7,9 +7,42 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 
 ### Planned
-- Phase 2: Live audio-reactive runtime (custom onset/beat detector, <5ms live path)
 - Phase 3: CMC-principled mapping integration (Palmer 2013 emotion-mediated colour)
 - Phase 4: UX (shader library, mapping editor, setlist-prep mode, performance mode)
+
+---
+
+## [0.3.0] — 2026-04-21
+
+### Added
+- **Phase 2: Live audio-reactive runtime** — end-to-end audio capture → feature extraction → uniform injection → live render loop
+- **`AudioAnalyzer`** (`chromaticity/audio.py`) — custom SuperFlux-style onset detector (spectral flux + adaptive threshold), autocorrelation-based tempo tracker, 8-band STFT energy extraction, spectral centroid, RMS energy. ~350 LOC, no GPL dependencies.
+- **`AudioFeatures` dataclass** — per-frame feature snapshot: bands (8), spectral_centroid, rms_energy, onset_strength, beat_phase, bpm, tempo_confidence
+- **`tempo_confidence`** — rolling coefficient-of-variation over BPM history; 0.0 = unstable/unknown, 1.0 = stable. Confidence-weighted beat_phase blend: when low, beat_phase falls back to sub_bass (band_0) energy for genre-agnostic graceful degradation
+- **`AudioFeatureBuffer`** — thread-safe latest-value exchange between audio callback thread and render thread
+- **`SoundDeviceAudioSource`** — real-time audio capture via sounddevice callbacks (MIT)
+- **`NullAudioSource`** — silent fallback when no audio device available
+- **`UniformMapper`** (`chromaticity/mapper.py`) — maps AudioFeatures → shader uniform values. Frequency-split heuristic defaults (sub_bass→band_0, presence/air→band_6, mid→onset_strength, brightness→rms). Supports JSON mapping file override. Smoothing parameter.
+- **`HeadlessBackend`** + **`PygletBackend`** (`chromaticity/live.py`) — offscreen and windowed render backends
+- **`run_live()`** — live render loop; <5ms audio-to-uniform path confirmed
+- **CLI `live` subcommand** — `python -m chromaticity live <shader.glsl> [--mapping <json>] [--device <idx>] [--width] [--height] [--fps] [--fullscreen] [--min-bpm] [--max-bpm] [--genre {dnb,house,techno,ambient,auto}]`
+- **CLI `devices` subcommand** — lists available audio input devices as JSON
+- **Genre presets** — `--genre dnb` (min_bpm=80), `house` (min_bpm=100), `techno` (min_bpm=120), `ambient` (min_bpm=40), `auto` (default 60–200)
+- **Phase 2 test suite** — `test_click_train_tempo_detection`, `test_run_live_headless_smoke`, `test_default_mapping_heuristics`, `test_custom_mapping_json_round_trip`
+
+### Fixed
+- **Onset envelope window**: extended from 2s → 6s at 512 hop for stable BPM detection at slow tempos (<80 BPM)
+- **Metrical ambiguity**: prefer-lower-tempo peak selection in autocorrelation to resolve half/double-time ambiguity
+- **glsl_parser.py SHADERTOY_BUILTINS**: added `iTimeDelta`, `iFrame`, `iFrameRate`, `iDate`, `iSampleRate`, `iChannelTime`, `iChannelResolution` — previously missing builtins caused incorrect audio mappings on shaders declaring these uniforms
+- **HeadlessBackend double-FBO**: removed duplicate framebuffer creation (resource leak)
+- **probe.py `datetime.utcnow()`**: replaced deprecated call with `datetime.now(datetime.UTC)`
+
+### Known limitations
+- **Irregular meter / mixed time signatures** (e.g. tracks with polyrhythm or tempo changes): autocorrelation-based detector produces musically plausible but metrically ambiguous output. Handled gracefully by tempo_confidence fallback; not a bug.
+- **Windows audio backend**: WASAPI/MME/DirectSound not yet validated. macOS CoreAudio validated.
+- **Photosensitive safety mode**: STANDARDS.md specifies a 3Hz flicker-rate cap for Phase 2+. Not yet implemented. Planned for Phase 3.
+- **vec3/vec4 uniform mapping**: mapper returns `dict[str, float]` only; vector uniforms receive broadcast scalar. Phase 3 will extend mapper for vector-valued output required by CMC colour pipeline.
+- **Per-uniform render-probe profiles**: Phase 1 profiles record iTime sensitivity only, not per-uniform visual signatures. Phase 3 classification uses Option (c): itime_sensitivity for overall shader characterisation + name heuristics for per-uniform mapping.
 
 ---
 

@@ -4,20 +4,29 @@ Rolling task list. `--ignore` flags and deferred work tracked here. When a task 
 
 ## Open
 
-- [ ] **Implement real-time onset detector** (SuperFlux-style, ~200-300 LOC) — prerequisite for Phase 2, clean-room implementation per ADR-003
-- [ ] **Implement real-time tempo tracker** (autocorrelation on onset history) — prerequisite for Phase 2
-- [ ] Validate custom beat detection against librosa baseline on brotherdurry-constancy.mp3
-- [x] Phase 1: Render-probe uniform analyser ✅ 2026-04-20 — CLI + profile schema v1.0, 7-shader suite profiled, noise floor calibrated, all Hermes review findings fixed (v0.2.1)
-- [ ] Phase 2: Live audio-reactive runtime
-- [ ] Phase 3: CMC-principled mapping integration
-- [ ] Phase 4: UX layer (shader library, mapping editor, performance mode)
+- [x] **Implement real-time onset detector** ✅ 2026-04-21 — SuperFlux-style spectral flux + adaptive threshold, ~200 LOC, `chromaticity/audio.py`
+- [x] **Implement real-time tempo tracker** ✅ 2026-04-21 — autocorrelation on 6s onset envelope, prefer-lower-tempo peak selection, `chromaticity/audio.py`
+- [x] **Phase 2: Live audio-reactive runtime** ✅ 2026-04-21 — v0.3.0. See CHANGELOG.
 - [x] Mapping profile JSON schema — ADR-003 written 2026-04-20, schema v1.0 locked
-- [ ] Beat tracking validation: compare aubio-inferred BPM against human-tapped ground truth on the untagged test track (Fletcher ear-taps his own track). Live performance gets raw audio, no metadata — the pipeline must work from waveform alone.
-- [ ] Photosensitive epilepsy safety mode — flicker rate limiting + user opt-in for strobe effects (Phase 2+)
+- [x] Phase 1: Render-probe uniform analyser ✅ 2026-04-20 — CLI + profile schema v1.0, 7-shader suite profiled, noise floor calibrated, all Hermes review findings fixed (v0.2.1)
+- [ ] **Phase 3: CMC-principled mapping integration** — spec at `docs/phase3-spec-draft.md`. Pending: Phase 2 MUST fixes, Palmer 2013 read, Hermes Phase 3 design review.
+- [ ] Phase 4: UX layer (shader library, mapping editor, performance mode)
+- [ ] Validate custom beat detection against librosa baseline on brotherdurry-constancy.mp3 (ADR-003 deliverable, still open)
+- [ ] **Photosensitive epilepsy safety mode** — flicker rate limiting, 3Hz cap by default, user opt-in for strobe effects. COMMITTED in STANDARDS.md for Phase 2+. **Safety regression — must ship before any public-facing release.**
 - [ ] Windows audio backend testing (sounddevice behaviour differs from macOS; validate WASAPI/MME/DirectSound paths)
 - [ ] macOS audio backend testing (CoreAudio permissions, device hot-swap handling)
 - [ ] GPU context loss recovery (long sessions + device switch — live performance requirement)
 - [ ] Shader sandboxing — what's the blast radius if a loaded shader is malicious/broken? (ADR required)
+- [ ] Phase 3 evaluation instrument implementation — web form or CLI tool for 8-item Likert rating (see `docs/phase3-spec-draft.md ## Phase 3 Evaluation Instrument`)
+
+## Known Limitations (Phase 2)
+
+- **Irregular meter / mixed time signatures**: autocorrelation tempo detector produces musically plausible but metrically ambiguous output on tracks with polyrhythm, tempo changes, or mixed meter (e.g. 5/4 + 4/4). Handled gracefully via `tempo_confidence` fallback to sub-bass energy. Not a bug — document in user-facing notes.
+- **Onset detector 1-hop latency**: onset events are confirmed one hop (512 samples ≈ 11.6ms at 44.1kHz) after they occur, because peak-picking requires the subsequent frame to confirm a local maximum. `onset_strength` in `AudioFeatures` reflects the current hop's flux value; the beat-anchor reset is delayed by one hop. Acceptable for visual sync; document if sub-10ms onset accuracy is ever required.
+- **Windows audio backend**: not validated. macOS CoreAudio validated.
+- **Photosensitive safety mode**: not yet implemented (see above).
+- **vec3/vec4 uniform mapping**: `map()` returns `dict[str, float]` only. Vector colour uniforms receive broadcast scalar. Phase 3 must extend mapper for vector-valued output.
+- **Per-uniform render-probe profiles**: Phase 1 profiles are iTime-only. Phase 3 uses Option (c): overall shader characterisation from itime_sensitivity + name heuristics per uniform. Full per-uniform profiling deferred.
 
 ## Deferred
 
