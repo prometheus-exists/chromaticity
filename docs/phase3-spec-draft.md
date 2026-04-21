@@ -112,6 +112,49 @@ Live renderer (Phase 2, unchanged)
 
 ---
 
+## Phase 3 Evaluation Instrument
+
+**Design**: Within-subjects, AB/BA counterbalanced. CMC-mapped vs. heuristic-mapped versions of the same stimulus, presented in randomised order. 5 stimulus pairs per session × 8 items = 40 ratings per participant. 2 participants (Xavier + Fletcher) = 80 total.
+
+**Scale**: 7-point Likert. 1 = Not at all, 7 = Perfectly.
+
+**Item presentation**: Items randomised within each stimulus block (no fixed dimension order). Free-text notes field after each block — optional, not required to proceed. No attention check items.
+
+**Scoring**: Reverse-code L2, C2, M2, O2 using formula (8 − score + 1). Average within each dimension for subscale scores. Average all 8 items for overall cohesiveness score.
+
+### Items
+
+| ID | Item | Direction |
+|----|------|-----------|
+| L1 | The brightness of the visuals matches the energy of the music. | Forward |
+| L2 | The visuals stay bright even when the music is quiet or subdued. | **Reverse** |
+| C1 | The colours feel emotionally appropriate for what the music expresses. | Forward |
+| C2 | The colour palette feels disconnected from the mood of the music. | **Reverse** |
+| M1 | The speed and rhythm of the visual movement matches the music. | Forward |
+| M2 | The visuals move at a pace that feels unrelated to the music's tempo or pulse. | **Reverse** |
+| O1 | The visuals and music feel like they belong together. | Forward |
+| O2 | Watching the visuals while listening to the music feels jarring or mismatched. | **Reverse** |
+
+### Subscale structure
+
+| Subscale | Items | Maps to CMC dimension |
+|----------|-------|----------------------|
+| Luminance | L1, L2(R) | RMS energy → brightness |
+| Colour | C1, C2(R) | Arousal/valence → palette |
+| Motion | M1, M2(R) | Beat phase / spectral flux → movement |
+| Overall cohesiveness | O1, O2(R) | Composite |
+
+### Session structure
+
+1. Load stimulus pair (CMC-mapped or heuristic-mapped — participant blind to condition)
+2. Play for 60 seconds
+3. Present 8 items in randomised order
+4. Optional free-text notes
+5. Repeat for next stimulus
+6. After all 5 stimuli: swap condition, repeat with counterbalanced order (AB/BA)
+
+---
+
 ## Phase 3 Definition of Done
 
 - [ ] `chromaticity/classifier.py` — reads render-probe profile JSON, classifies each uniform
