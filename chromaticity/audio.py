@@ -115,7 +115,7 @@ class AudioAnalyzer:
         self._flux_history: deque[float] = deque(maxlen=max(64, self._adaptive_window * 8))
         self._threshold_history: deque[float] = deque(maxlen=max(64, self._adaptive_window * 8))
         self._time_history: deque[float] = deque(maxlen=max(64, self._adaptive_window * 8))
-        self._onset_env_frames = max(3, int(math.ceil((2.0 * sample_rate) / hop_size)))
+        self._onset_env_frames = max(3, int(math.ceil((6.0 * sample_rate) / hop_size)))  # 6s window for robust tempo at slow BPM
         self._onset_envelope: deque[float] = deque(maxlen=self._onset_env_frames)
         self._onset_times: deque[float] = deque(maxlen=128)
         self._last_onset_time = -1e9
@@ -265,7 +265,30 @@ class AudioAnalyzer:
         search = autocorr[min_lag : max_lag + 1]
         if search.size == 0 or float(np.max(search)) <= 0.0:
             return 0.0
-        peak_lag = int(np.argmax(search)) + min_lag
+
+        # Find top-3 peaks in the search window to resolve metrical ambiguity.
+        # The autocorrelation often peaks at sub-beat lags (double tempo).
+        # We prefer the largest lag (lowest BPM candidate) among peaks whose
+        # autocorrelation value is at least 70% of the global maximum, then
+        # verify the half-tempo candidate doesn't score meaningfully higher.
+        global_max = float(np.max(search))
+        threshold = 0.70 * global_max
+
+        # Collect all local maxima above threshold
+        candidates: list[tuple[float, int]] = []  # (score, lag)
+        for i in range(1, len(search) - 1):
+            if search[i] >= threshold and search[i] >= search[i-1] and search[i] >= search[i+1]:
+                lag = i + min_lag
+                candidates.append((float(search[i]), lag))
+
+        if not candidates:
+            # Fall back to simple argmax
+            peak_lag = int(np.argmax(search)) + min_lag
+        else:
+            # Sort by lag descending (prefer slower tempo = larger lag)
+            candidates.sort(key=lambda x: x[1], reverse=True)
+            peak_lag = candidates[0][1]
+
         return float((60.0 * self.sample_rate) / (peak_lag * self.hop_size))
 
     def _compute_beat_phase(self, timestamp: float) -> float:
