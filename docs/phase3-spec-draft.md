@@ -1,9 +1,9 @@
 # Phase 3 Spec — CMC-Principled Mapping Integration
 
-**Status**: Draft (2026-04-21)
+**Status**: Draft (2026-04-21, revised post-Hermes Phase 3 review)
 **Authors**: Prometheus, Xavier, Fletcher Hammond
-**Resolved**: Hermes Phase 2 sign-off complete (PASS WITH CONDITIONS). Spectral centroid as valence proxy approved by Fletcher. Exit criterion agreed (80 ratings, 40/participant, AB/BA counterbalanced).
-**Pending**: Phase 2 MUST fixes, Palmer 2013 read before CMC mapping code
+**Resolved**: Hermes Phase 2 sign-off complete (PASS WITH CONDITIONS). Phase 2 MUST fixes applied (v0.3.0). Spectral centroid as valence proxy approved by Fletcher. Exit criterion agreed (80 ratings, 40/participant).
+**Pending**: Stimulus set selection (Xavier + Fletcher input required — see §Questions), evaluation isolation decision, Palmer 2013 read before CMC mapping code
 
 ---
 
@@ -63,11 +63,13 @@ This replaces the current name-heuristic fallback for shaders that have been pro
 
 **Paper**: Palmer, S.E., Schloss, K.B., Xu, Z., & Prado-León, L.R. (2013). Music-color associations are mediated by emotion. *PNAS*, 110(22), 8836-8841.
 
-**Core finding**: music-colour associations arise primarily through shared emotional content (valence and arousal), not direct acoustic-visual mappings. Fast/major/loud music → warm/bright/high-saturation colours because both evoke high arousal/positive valence.
+**Core finding**: music-colour associations arise primarily through shared emotional content (valence and arousal), not direct acoustic-visual mappings. The mechanism: fast/loud music evokes high arousal; major key evokes positive valence. High-arousal emotions and positive-valence emotions are independently associated with warm/saturated colours. Arousal and valence are separable axes — fast/loud does NOT imply positive valence, and major key does NOT imply high arousal.
 
 **For Chromaticity**:
-- Extract **arousal proxy**: RMS energy (weighted) + normalised BPM when confident
-- Extract **valence proxy**: spectral brightness (centroid) — brighter spectrum correlates with "positive" timbre
+- Extract **arousal proxy**: `arousal = 0.7 × norm_rms + 0.3 × tempo_confidence × norm_bpm`
+  where `norm_rms = rms / rms_ref` (running 95th-percentile reference), `norm_bpm = (bpm − 60) / 140`, both clamped [0, 1]. Weights w_rms=0.7, w_bpm=0.3 are tuneable. RMS dominates because it responds at beat timescale; BPM contributes sustained phrase-level modulation when tempo is stable.
+- Extract **valence proxy**: spectral brightness (centroid) — brighter spectrum correlates with "positive" timbre (Hailstone et al. 2009, Eerola et al. 2009).
+  ⚠️ **Known limitation**: centroid is mode-blind. Bright minor-key or dissonant music will be miscoded as positive valence. Tracks where this proxy fails: dark/neurofunk DnB, industrial, bright atonal content. Stimulus selection must avoid these for evaluation validity (see §Evaluation Design).
 - Map arousal × valence to a 2D colour palette grid
   - High arousal + high valence: warm, saturated (reds/yellows/oranges)
   - High arousal + low valence: cool saturated (blues/purples — energetic but dark)
@@ -120,7 +122,7 @@ Live renderer (Phase 2, unchanged)
 
 **Item presentation**: Items randomised within each stimulus block (no fixed dimension order). Free-text notes field after each block — optional, not required to proceed. No attention check items.
 
-**Scoring**: Reverse-code L2, C2, M2, O2 using formula (8 − score + 1). Average within each dimension for subscale scores. Average all 8 items for overall cohesiveness score.
+**Scoring**: Reverse-code L2, C2, M2, O2 using formula **(8 − score)**. A score of 7 (strongest agreement with a negative statement) becomes 1; a score of 1 becomes 7. Average within each dimension for subscale scores. Average all 8 items for overall cohesiveness score.
 
 ### Items
 
@@ -133,7 +135,7 @@ Live renderer (Phase 2, unchanged)
 | M1 | The speed and rhythm of the visual movement matches the music. | Forward |
 | M2 | The visuals move at a pace that feels unrelated to the music's tempo or pulse. | **Reverse** |
 | O1 | The visuals and music feel like they belong together. | Forward |
-| O2 | Watching the visuals while listening to the music feels jarring or mismatched. | **Reverse** |
+| O2 | Watching the visuals while listening to the music feels disconnected or arbitrary. | **Reverse** |
 
 ### Subscale structure
 
@@ -146,12 +148,14 @@ Live renderer (Phase 2, unchanged)
 
 ### Session structure
 
-1. Load stimulus pair (CMC-mapped or heuristic-mapped — participant blind to condition)
+1. Load stimulus (labelled “Condition A” or “Condition B” — labels randomised per participant/session, no descriptive names)
 2. Play for 60 seconds
 3. Present 8 items in randomised order
 4. Optional free-text notes
-5. Repeat for next stimulus
-6. After all 5 stimuli: swap condition, repeat with counterbalanced order (AB/BA)
+5. Repeat for all stimuli in this session
+6. Separate session: same stimuli in opposite condition (AB/BA counterbalanced across participants)
+
+**Blinding note**: Full double-blind is not achievable with 2 expert co-developers as participants. The condition labels (A/B) are neutral and randomised, but demand characteristics cannot be fully eliminated. Treat this as expert formative evaluation; note the blinding limitation explicitly in any write-up.
 
 ---
 
@@ -159,19 +163,57 @@ Live renderer (Phase 2, unchanged)
 
 - [ ] `chromaticity/classifier.py` — reads render-probe profile JSON, classifies each uniform
 - [ ] `chromaticity/cmc.py` — CMC mapping table, maps classified uniforms to audio features
-- [ ] `chromaticity/emotion.py` — arousal/valence extraction from AudioFeatures
+- [ ] `chromaticity/emotion.py` — arousal/valence extraction from AudioFeatures (note: DoD and architecture both use `emotion.py` — canonical name)
 - [ ] `chromaticity/palette.py` — three-tier colour control, emotion → palette shift
 - [ ] `UniformMapper` updated to use classifier output when profile is available (falls back to heuristic when not)
 - [ ] `python -m chromaticity live <shader.glsl>` works with and without a pre-computed profile
 - [ ] `python -m chromaticity probe <shader.glsl>` updated to output profile in the format classifier expects
-- [ ] Validation: probe + live on 3sySRK, 7cBSDR, XtK3W3 — visual response is perceptually appropriate
+- [ ] Validation: probe + live on evaluation shader set — visual response is perceptually appropriate
+- [ ] Evaluation classifications documented: for each evaluation shader, which uniform classifications are manually verified vs. heuristic-inferred
 - [ ] Tests for classifier, cmc, emotion modules
 - [ ] Palmer 2013 arousal/valence mapping documented in `docs/explanation/cmc-mapping.md`
+- [ ] Photosensitive safety mode (3Hz flicker cap) implemented — committed in STANDARDS.md for Phase 2+, safety regression until shipped
+- [ ] Colour pipeline extended: `palette.py` returns `dict[str, tuple[float, float, float]]` for colour-dominant uniforms; render loop merges with scalar mapper output
 - [ ] CHANGELOG.md updated
-- [ ] **Exit criterion met**: 80 preference ratings collected (40 per participant × Xavier + Fletcher), within-subjects counterbalanced AB/BA design — CMC-mapped vs. heuristic-mapped versions of the same stimulus in randomised order
+- [ ] **Pilot gate**: 10 ratings from 1 participant before full data collection. Check for floor/ceiling effects and item variance.
+- [ ] **Exit criterion met**: 80 preference ratings collected (40 per participant × Xavier + Fletcher), within-subjects counterbalanced AB/BA design, neutral condition labels (A/B)
 
 ### Exit criterion rationale (agreed 2026-04-21)
 Power basis: CMC literature reports d=2.5–3.3 (Palmer 2013 F-values imply Cohen's f≈1.0; RT-based CMC studies report d=2.87–3.28). At d≥2.5, α=0.05, power=0.80: ~5 observations/condition suffices in a within-subjects design. 40 ratings per participant provides a stability buffer well above minimum power requirements. Two expert observers (Xavier + Fletcher, extensive visualiser exposure) are appropriate for this effect size range — perception literature routinely uses n=2–8 for large CMC effects.
+
+---
+
+## Questions for Xavier + Fletcher (blocking)
+
+These need answers before the evaluation design can be finalised. The rest of Phase 3 implementation can proceed in parallel.
+
+**Q1 — Stimulus set (most important):**
+We need 5 tracks (or 10 for no-repetition design — see Q2). Each track must have:
+- Dynamic energy range (loud/quiet sections, so L1/L2 can be tested)
+- Clear rhythmic pulse (so M1/M2 can be tested)
+- Timbral variation (so spectral centroid changes meaningfully over the track)
+- Centroid-valence validity: bright sections should feel positive/uplifting; dark sections should feel heavy/tense. **Tracks where bright = aggressive/dissonant should be excluded** (centroid proxy will be wrong).
+
+Candidates? You can nominate tracks from Fletcher's library or other sources. For each: name, rough BPM, genre, and whether you think the brightness-positivity correlation holds.
+
+**Q2 — Repetition vs. no-repetition design:**
+Hermes flagged that showing each participant the same track twice (CMC condition + heuristic condition) creates carryover — the second viewing isn't perceptually naive. Two options:
+- **5 tracks × 2 conditions = 10 stimulus exposures per participant** (current plan, some carryover risk)
+- **10 tracks × 1 condition each = 10 stimulus exposures per participant** (no repetition, cleaner, but needs 10 tracks and one participant sees CMC on tracks 1-5 and heuristic on tracks 6-10 — different stimuli per condition)
+
+Which design is better for your purposes?
+
+**Q3 — Evaluation isolation:**
+Hermes recommends isolating the colour manipulation: test CMC-colour vs. heuristic-colour with brightness (L) and motion (M) held constant between conditions. This makes the Colour subscale the primary outcome and the result interpretable ("CMC colour mapping is better" rather than "something about CMC is better"). The cost: you're not testing the full CMC package, just the colour layer.
+
+Alternative: test the full CMC mapping vs. full heuristic, accept that the result is a composite, and treat the subscale scores as exploratory breakdowns.
+
+Which serves your goals better?
+
+**Q4 — One shader or multiple:**
+Hermes recommends fixing one shader for the quantitative evaluation to eliminate shader as a confound (i.e. all 5/10 tracks played over the same shader). This lets you say "CMC is better on shader X" cleanly. Using multiple shaders adds a shader confound.
+
+Is there one shader you want to be the primary evaluation shader? (3sySRK, 7cBSDR, or XtK3W3 are the profiled candidates.)
 
 ---
 
