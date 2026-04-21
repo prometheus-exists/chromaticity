@@ -8,6 +8,7 @@ requires-python = ">=3.11"
 dependencies = [
     "moderngl>=5.12",     # BSD-2-Clause
     "numpy>=2.4",         # BSD-3-Clause
+    "pyglet>=2.1",        # BSD-3-Clause
     "scikit-image>=0.26", # BSD-3-Clause
     "sounddevice>=0.5",   # MIT
     "librosa>=0.11",      # ISC (offline analysis only; real-time path uses custom implementation)
