@@ -386,6 +386,8 @@ class SoundDeviceAudioSource:
     sample_rate: int = DEFAULT_SAMPLE_RATE
     hop_size: int = DEFAULT_HOP_SIZE
     window_size: int = DEFAULT_WINDOW_SIZE
+    min_bpm: float = DEFAULT_MIN_BPM
+    max_bpm: float = DEFAULT_MAX_BPM
     _stream: Any = field(init=False, default=None, repr=False)
     _analyzer: AudioAnalyzer = field(init=False, repr=False)
 
@@ -394,6 +396,8 @@ class SoundDeviceAudioSource:
             sample_rate=self.sample_rate,
             hop_size=self.hop_size,
             window_size=self.window_size,
+            min_bpm=self.min_bpm,
+            max_bpm=self.max_bpm,
         )
 
     def start(self, feature_buffer: AudioFeatureBuffer) -> None:

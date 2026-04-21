@@ -259,9 +259,13 @@ def _create_backend(
     return PygletBackend(shader_source, uniform_infos, width, height, fullscreen)
 
 
-def _create_audio_source(audio_device: int | None) -> tuple[object, str | None]:
+def _create_audio_source(
+    audio_device: int | None,
+    min_bpm: float = 60.0,
+    max_bpm: float = 200.0,
+) -> tuple[object, str | None]:
     try:
-        source = SoundDeviceAudioSource(device=audio_device)
+        source = SoundDeviceAudioSource(device=audio_device, min_bpm=min_bpm, max_bpm=max_bpm)
         return source, None
     except Exception as exc:
         return NullAudioSource(), str(exc)
@@ -276,6 +280,8 @@ def run_live(
     fps: int = 60,
     fullscreen: bool = False,
     *,
+    min_bpm: float = 60.0,
+    max_bpm: float = 200.0,
     duration_seconds: float | None = None,
     headless: bool = False,
 ) -> LiveRunStats:
@@ -293,7 +299,7 @@ def run_live(
         fullscreen=fullscreen,
         headless=headless,
     )
-    audio_source, warning = _create_audio_source(audio_device)
+    audio_source, warning = _create_audio_source(audio_device, min_bpm=min_bpm, max_bpm=max_bpm)
     audio_mode = "live"
     try:
         try:

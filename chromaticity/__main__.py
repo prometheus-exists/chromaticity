@@ -30,6 +30,18 @@ def main(argv: list[str] | None = None) -> int:
     live_parser.add_argument("--height", type=int, default=720)
     live_parser.add_argument("--fps", type=int, default=60)
     live_parser.add_argument("--fullscreen", action="store_true")
+    live_parser.add_argument(
+        "--min-bpm", type=float, default=60.0,
+        help="Minimum BPM for tempo detection (default 60). Use 80-100 for dance music to avoid half-time ambiguity.",
+    )
+    live_parser.add_argument(
+        "--max-bpm", type=float, default=200.0,
+        help="Maximum BPM for tempo detection (default 200).",
+    )
+    live_parser.add_argument(
+        "--genre", choices=["dnb", "house", "techno", "ambient", "auto"], default="auto",
+        help="Genre preset: dnb=min80, house=min100, techno=min120, ambient=min40, auto=default.",
+    )
 
     subparsers.add_parser("devices", help="List audio input devices")
 
@@ -51,6 +63,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "live":
+        # Genre presets override explicit min/max-bpm
+        genre_presets = {
+            "dnb":     (80.0,  200.0),
+            "house":   (100.0, 160.0),
+            "techno":  (120.0, 160.0),
+            "ambient": (40.0,  100.0),
+            "auto":    (args.min_bpm, args.max_bpm),
+        }
+        min_bpm, max_bpm = genre_presets.get(args.genre, (args.min_bpm, args.max_bpm))
         run_live(
             shader_path=args.shader,
             mapping_path=args.mapping,
@@ -59,6 +80,8 @@ def main(argv: list[str] | None = None) -> int:
             height=args.height,
             fps=args.fps,
             fullscreen=args.fullscreen,
+            min_bpm=min_bpm,
+            max_bpm=max_bpm,
         )
         return 0
 
