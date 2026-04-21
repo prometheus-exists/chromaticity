@@ -41,6 +41,7 @@ class AudioFeatures:
     onset_strength: float
     beat_phase: float
     bpm: float
+    tempo_confidence: float  # 0.0 = unstable/unknown, 1.0 = very stable
 
     @classmethod
     def silence(
@@ -59,6 +60,7 @@ class AudioFeatures:
             onset_strength=0.0,
             beat_phase=0.0,
             bpm=0.0,
+            tempo_confidence=0.0,
         )
 
 
@@ -123,6 +125,10 @@ class AudioAnalyzer:
         self._bpm_estimate = 0.0
         self._tempo_alpha = 0.05
         self._min_inter_onset = 0.05
+        # Confidence tracking: rolling window of recent BPM estimates
+        # High variance = low confidence; zero estimates = zero confidence
+        self._bpm_history: deque[float] = deque(maxlen=40)  # ~5s at 512 hop
+        self._tempo_confidence = 0.0
 
         nyquist = sample_rate / 2.0
         freqs = np.fft.rfftfreq(window_size, d=1.0 / sample_rate)
@@ -199,6 +205,19 @@ class AudioAnalyzer:
                     (1.0 - self._tempo_alpha) * self._bpm_estimate
                     + self._tempo_alpha * candidate_bpm
                 )
+            self._bpm_history.append(self._bpm_estimate)
+
+        # Compute tempo confidence: 0 when no estimate, higher when stable
+        # Uses coefficient of variation (std/mean) — low CV = high confidence
+        if len(self._bpm_history) >= 8 and self._bpm_estimate > 0.0:
+            arr = np.asarray(self._bpm_history, dtype=np.float32)
+            cv = float(np.std(arr) / (np.mean(arr) + 1e-6))
+            # CV < 0.02 (2% variation) = confident; CV > 0.15 = not confident
+            raw_conf = 1.0 - min(1.0, cv / 0.15)
+            # Blend toward new confidence slowly (0.1 alpha = stable)
+            self._tempo_confidence = 0.9 * self._tempo_confidence + 0.1 * raw_conf
+        elif self._bpm_estimate <= 0.0:
+            self._tempo_confidence *= 0.95  # decay when no estimate
 
         beat_phase = self._compute_beat_phase(timestamp)
 
@@ -212,6 +231,7 @@ class AudioAnalyzer:
             onset_strength=onset_strength,
             beat_phase=beat_phase,
             bpm=float(self._bpm_estimate),
+            tempo_confidence=float(self._tempo_confidence),
         )
 
     def _compute_threshold(self, flux: float) -> float:

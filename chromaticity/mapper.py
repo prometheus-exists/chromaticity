@@ -93,7 +93,15 @@ class UniformMapper:
         if name in {"onset", "onset_strength", "spectral_flux"}:
             return float(features.onset_strength)
         if name in {"beat_phase", "phase"}:
-            return float(features.beat_phase)
+            # Blend beat_phase with sub-bass energy based on tempo confidence.
+            # When confidence is low (irregular meter, silence, mixed time sig),
+            # fall back to band_0 (sub-bass) as the pulse signal so the
+            # visualiser stays responsive without a locked tempo grid.
+            conf = float(features.tempo_confidence)
+            bass_energy = float(features.bands[0]) if features.bands else 0.0
+            return conf * float(features.beat_phase) + (1.0 - conf) * bass_energy
+        if name in {"tempo_confidence", "confidence"}:
+            return float(features.tempo_confidence)
         if name in {"bpm"}:
             return float(features.bpm)
         if name in {"tempo", "tempo_norm"}:

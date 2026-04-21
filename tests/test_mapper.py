@@ -16,6 +16,7 @@ def _features() -> AudioFeatures:
         onset_strength=0.9,
         beat_phase=0.25,
         bpm=120.0,
+        tempo_confidence=0.9,
     )
 
 
@@ -32,7 +33,11 @@ def test_default_mapping_heuristics():
     values = mapper.map(_features())
     assert abs(values["uSpeed"] - 1.0) < 1e-6
     assert abs(values["uAmp"] - 0.5) < 1e-6
-    assert abs(values["uPhaseTime"] - 0.25) < 1e-6
+    # beat_phase blends with band_0 based on tempo_confidence:
+    # 0.9 * 0.25 + 0.1 * 0.1 = 0.235
+    feat = _features()
+    expected_phase = feat.tempo_confidence * feat.beat_phase + (1.0 - feat.tempo_confidence) * feat.bands[0]
+    assert abs(values["uPhaseTime"] - expected_phase) < 1e-5
     assert values["uFallback"] >= 0.0
     assert values["iTime"] >= 0.0
 
